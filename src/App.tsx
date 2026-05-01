@@ -3,6 +3,7 @@ import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { ProgressBar } from './components/layout/ProgressBar';
 import { IntroModal } from './components/layout/IntroModal';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
 import { WizardRouter } from './components/wizard/WizardRouter';
 
 function Shell() {
@@ -22,8 +23,10 @@ function Shell() {
 
 export default function App() {
   return (
-    <CalculatorProvider>
-      <Shell />
-    </CalculatorProvider>
+    <ErrorBoundary>
+      <CalculatorProvider>
+        <Shell />
+      </CalculatorProvider>
+    </ErrorBoundary>
   );
 }

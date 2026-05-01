@@ -1277,9 +1277,12 @@ function FooterActions({
   onReset: () => void;
   onDownloadPdf: () => void;
 }) {
-  const [mode, setMode] = useState<'idle' | 'gate' | 'preparing'>('idle');
+  const [mode, setMode] = useState<'idle' | 'gate' | 'preparing' | 'failed'>(
+    'idle',
+  );
   const [gateEmail, setGateEmail] = useState('');
   const gateInputRef = useRef<HTMLInputElement>(null);
+  const failTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (mode === 'gate') {
@@ -1287,13 +1290,30 @@ function FooterActions({
     }
   }, [mode]);
 
+  useEffect(() => {
+    return () => {
+      if (failTimerRef.current !== null) {
+        window.clearTimeout(failTimerRef.current);
+      }
+    };
+  }, []);
+
   const startDownload = () => {
     setMode('preparing');
     window.setTimeout(() => {
       try {
         onDownloadPdf();
-      } finally {
         setMode('idle');
+      } catch (err) {
+        console.error('PDF generation failed:', err);
+        setMode('failed');
+        if (failTimerRef.current !== null) {
+          window.clearTimeout(failTimerRef.current);
+        }
+        failTimerRef.current = window.setTimeout(() => {
+          setMode('idle');
+          failTimerRef.current = null;
+        }, 6000);
       }
     }, 500);
   };
@@ -1367,6 +1387,16 @@ function FooterActions({
         </motion.div>
       )}
 
+      {mode === 'failed' && (
+        <div
+          role="alert"
+          className="rounded-lg border border-red-brand/40 bg-red-brand/5 px-4 py-3 text-sm text-red-brand"
+        >
+          Couldn't generate the PDF. Try again, or refresh the page if it
+          keeps happening.
+        </div>
+      )}
+
       <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <Button variant="ghost" onClick={onBack}>
@@ -1388,6 +1418,8 @@ function FooterActions({
               <Spinner className="h-4 w-4" />
               <span>Preparing PDF</span>
             </>
+          ) : mode === 'failed' ? (
+            'Try again'
           ) : (
             'Download as PDF'
           )}
