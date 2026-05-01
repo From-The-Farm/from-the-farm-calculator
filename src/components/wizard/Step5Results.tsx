@@ -33,6 +33,7 @@ import {
   fmtPct,
 } from '../../lib/formatters';
 import { exportPricingPdf } from '../../lib/pdf';
+import { captureLead } from '../../lib/leadCapture';
 import type {
   AnimalKey,
   CalculatorResult,
@@ -1128,6 +1129,7 @@ function SaveCard({
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [leadIssue, setLeadIssue] = useState(false);
   const failTimerRef = useRef<number | null>(null);
   const sent = leadEmail.length > 0;
   const canSubmit = name.trim().length > 0 && email.trim().length > 0;
@@ -1143,11 +1145,14 @@ function SaveCard({
   const triggerDownload = () => {
     setSubmitting(true);
     setFailed(false);
-    window.setTimeout(() => {
+    setLeadIssue(false);
+
+    void (async () => {
+      // Brief "Preparing PDF" delay so the spinner reads as deliberate.
+      await new Promise((r) => window.setTimeout(r, 500));
+
       try {
         onDownloadPdf();
-        setSubmitting(false);
-        if (!sent) onLeadEmail(email);
       } catch (err) {
         console.error('PDF generation failed:', err);
         setSubmitting(false);
@@ -1159,8 +1164,24 @@ function SaveCard({
           setFailed(false);
           failTimerRef.current = null;
         }, 6000);
+        return;
       }
-    }, 500);
+
+      // PDF downloaded; capture the lead (only on first submit).
+      if (!sent) {
+        const result = await captureLead({
+          name: name.trim(),
+          email: email.trim(),
+          source: 'ftf-pricing-calculator',
+        });
+        if (!result.ok && result.reason !== 'no-url') {
+          setLeadIssue(true);
+        }
+        onLeadEmail(email);
+      }
+
+      setSubmitting(false);
+    })();
   };
 
   const onSubmit = (e: FormEvent) => {
@@ -1188,12 +1209,14 @@ function SaveCard({
             <div className="flex flex-col items-start gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-green-brand/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-brand">
                 <span aria-hidden="true">✓</span>
-                Saved &amp; downloaded
+                {leadIssue ? 'Downloaded' : 'Saved & downloaded'}
               </span>
               <p className="text-sm text-ink leading-relaxed">
                 Thanks{name ? `, ${name.split(' ')[0]}` : ''}. Your pricing
-                report has downloaded. We'll email you the moment Save Profile
-                is ready.
+                report has downloaded.
+                {leadIssue
+                  ? " We hit a snag saving your info — feel free to try again, or email us at hello@fromthefarm.com and we'll add you manually."
+                  : " We'll email you the moment Save Profile is ready."}
               </p>
               {failed && (
                 <p
