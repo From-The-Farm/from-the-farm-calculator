@@ -26,7 +26,7 @@ export function Step4Profit() {
       title="Your profit goal"
       description="Tell us how much you want to make on this batch — we'll back-solve the price."
     >
-      <div className="flex justify-center">
+      <div className="flex justify-start">
         <Segmented
           options={MODE_OPTIONS}
           value={step4.mode}
