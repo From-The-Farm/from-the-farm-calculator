@@ -271,17 +271,15 @@ function ResultScreen({
 
         <ChannelComparisonCard channels={channels} animal={animal} />
 
-        <SaveCard leadEmail={leadEmail} onLeadEmail={onLeadEmail} />
+        <SaveCard
+          leadEmail={leadEmail}
+          onLeadEmail={onLeadEmail}
+          onDownloadPdf={onDownloadPdf}
+        />
 
         <Assumptions premium={premium} />
 
-        <FooterActions
-          leadEmail={leadEmail}
-          onLeadEmail={onLeadEmail}
-          onBack={onBack}
-          onReset={onReset}
-          onDownloadPdf={onDownloadPdf}
-        />
+        <FooterActions onBack={onBack} onReset={onReset} />
       </RevealLayer>
     </StepShell>
   );
@@ -1120,28 +1118,55 @@ function ChannelComparisonCard({ channels, animal }: ChannelCardProps) {
 function SaveCard({
   leadEmail,
   onLeadEmail,
+  onDownloadPdf,
 }: {
   leadEmail: string;
   onLeadEmail: (email: string) => void;
+  onDownloadPdf: () => void;
 }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const failTimerRef = useRef<number | null>(null);
   const sent = leadEmail.length > 0;
-  const status: 'idle' | 'submitting' | 'sent' = sent
-    ? 'sent'
-    : submitting
-      ? 'submitting'
-      : 'idle';
+  const canSubmit = name.trim().length > 0 && email.trim().length > 0;
+
+  useEffect(() => {
+    return () => {
+      if (failTimerRef.current !== null) {
+        window.clearTimeout(failTimerRef.current);
+      }
+    };
+  }, []);
+
+  const triggerDownload = () => {
+    setSubmitting(true);
+    setFailed(false);
+    window.setTimeout(() => {
+      try {
+        onDownloadPdf();
+        setSubmitting(false);
+        if (!sent) onLeadEmail(email);
+      } catch (err) {
+        console.error('PDF generation failed:', err);
+        setSubmitting(false);
+        setFailed(true);
+        if (failTimerRef.current !== null) {
+          window.clearTimeout(failTimerRef.current);
+        }
+        failTimerRef.current = window.setTimeout(() => {
+          setFailed(false);
+          failTimerRef.current = null;
+        }, 6000);
+      }
+    }, 500);
+  };
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    setSubmitting(true);
-    window.setTimeout(() => {
-      onLeadEmail(email);
-      setSubmitting(false);
-    }, 700);
+    if (!canSubmit) return;
+    triggerDownload();
   };
 
   return (
@@ -1152,39 +1177,61 @@ function SaveCard({
             Save your pricing
           </h2>
           <p className="mt-2 text-sm text-muted leading-relaxed">
-            Costs change with the season. Drop your email and we'll let you know
-            when accounts go live so you can come back and update without
-            starting over.
+            Drop your name and email to download a PDF of your pricing. Costs
+            change with the season — we'll also email you when Save Profile
+            goes live so you can come back and update without starting over.
           </p>
         </div>
 
         <div className="sm:col-span-3 px-5 sm:px-6 py-5 sm:py-6">
-          {status === 'sent' ? (
-            <div className="flex flex-col items-start gap-2">
+          {sent ? (
+            <div className="flex flex-col items-start gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-green-brand/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-brand">
                 <span aria-hidden="true">✓</span>
-                You're on the list
+                Saved &amp; downloaded
               </span>
-              <p className="text-sm text-ink">
-                Thanks{name ? `, ${name.split(' ')[0]}` : ''}. We'll email you
-                the moment Save Profile is ready.
+              <p className="text-sm text-ink leading-relaxed">
+                Thanks{name ? `, ${name.split(' ')[0]}` : ''}. Your pricing
+                report has downloaded. We'll email you the moment Save Profile
+                is ready.
               </p>
-              <p className="text-xs text-muted">
-                Want a copy now? Use Download as PDF below.
-              </p>
+              {failed && (
+                <p
+                  role="alert"
+                  className="rounded-lg border border-red-brand/40 bg-red-brand/5 px-3 py-2 text-sm text-red-brand"
+                >
+                  Couldn't generate the PDF this time. Try again, or refresh
+                  the page if it keeps happening.
+                </p>
+              )}
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={triggerDownload}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <>
+                    <Spinner className="h-4 w-4" />
+                    <span>Preparing PDF</span>
+                  </>
+                ) : failed ? (
+                  'Try again'
+                ) : (
+                  'Download again'
+                )}
+              </Button>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-3">
               <div className="grid sm:grid-cols-2 gap-3">
                 <label className="block">
                   <span className="block text-xs font-bold uppercase tracking-wider text-ink mb-1.5">
-                    Your name{' '}
-                    <span className="text-muted font-normal normal-case tracking-normal">
-                      (optional)
-                    </span>
+                    Your name
                   </span>
                   <input
                     type="text"
+                    required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     autoComplete="name"
@@ -1207,22 +1254,33 @@ function SaveCard({
                   />
                 </label>
               </div>
+              {failed && (
+                <p
+                  role="alert"
+                  className="rounded-lg border border-red-brand/40 bg-red-brand/5 px-3 py-2 text-sm text-red-brand"
+                >
+                  Couldn't generate the PDF. Try again, or refresh the page if
+                  it keeps happening.
+                </p>
+              )}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <p className="text-xs text-muted">
                   We'll never sell your email.
                 </p>
                 <Button
                   type="submit"
-                  variant="primary"
-                  disabled={status === 'submitting' || !email}
+                  variant="gold"
+                  disabled={submitting || !canSubmit}
                 >
-                  {status === 'submitting' ? (
+                  {submitting ? (
                     <>
                       <Spinner className="h-4 w-4" />
-                      <span>Sending</span>
+                      <span>Preparing PDF</span>
                     </>
+                  ) : failed ? (
+                    'Try again'
                   ) : (
-                    'Save Profile'
+                    'Download PDF'
                   )}
                 </Button>
               </div>
@@ -1265,166 +1323,20 @@ function Assumptions({ premium }: { premium: boolean }) {
 }
 
 function FooterActions({
-  leadEmail,
-  onLeadEmail,
   onBack,
   onReset,
-  onDownloadPdf,
 }: {
-  leadEmail: string;
-  onLeadEmail: (email: string) => void;
   onBack: () => void;
   onReset: () => void;
-  onDownloadPdf: () => void;
 }) {
-  const [mode, setMode] = useState<'idle' | 'gate' | 'preparing' | 'failed'>(
-    'idle',
-  );
-  const [gateEmail, setGateEmail] = useState('');
-  const gateInputRef = useRef<HTMLInputElement>(null);
-  const failTimerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (mode === 'gate') {
-      gateInputRef.current?.focus();
-    }
-  }, [mode]);
-
-  useEffect(() => {
-    return () => {
-      if (failTimerRef.current !== null) {
-        window.clearTimeout(failTimerRef.current);
-      }
-    };
-  }, []);
-
-  const startDownload = () => {
-    setMode('preparing');
-    window.setTimeout(() => {
-      try {
-        onDownloadPdf();
-        setMode('idle');
-      } catch (err) {
-        console.error('PDF generation failed:', err);
-        setMode('failed');
-        if (failTimerRef.current !== null) {
-          window.clearTimeout(failTimerRef.current);
-        }
-        failTimerRef.current = window.setTimeout(() => {
-          setMode('idle');
-          failTimerRef.current = null;
-        }, 6000);
-      }
-    }, 500);
-  };
-
-  const handlePdfClick = () => {
-    if (leadEmail) {
-      startDownload();
-    } else {
-      setGateEmail('');
-      setMode('gate');
-    }
-  };
-
-  const handleGateSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!gateEmail) return;
-    onLeadEmail(gateEmail);
-    startDownload();
-  };
-
   return (
-    <div className="pt-2 space-y-4">
-      {mode === 'gate' && (
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-lg border border-gold/40 bg-gold/[0.05] p-4 sm:p-5"
-        >
-          <form onSubmit={handleGateSubmit} className="space-y-3">
-            <div>
-              <h3 className="font-heading uppercase tracking-wide text-sm font-semibold text-navy">
-                One quick thing
-              </h3>
-              <p className="mt-1 text-sm text-ink leading-relaxed">
-                Drop your email and we'll send you a copy of this report. We'll
-                also let you know when Save Profile goes live so you can keep
-                this updated.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <label className="flex-1">
-                <span className="sr-only">Email</span>
-                <input
-                  ref={gateInputRef}
-                  type="email"
-                  required
-                  value={gateEmail}
-                  onChange={(e) => setGateEmail(e.target.value)}
-                  autoComplete="email"
-                  inputMode="email"
-                  placeholder="you@yourfarm.com"
-                  className="form-input w-full rounded-lg border border-line bg-white px-3 py-3 text-base text-ink placeholder:text-muted focus:border-navy focus:ring-2 focus:ring-gold/40"
-                />
-              </label>
-              <Button type="submit" variant="gold" disabled={!gateEmail}>
-                Send my PDF
-              </Button>
-            </div>
-            <div className="flex items-center justify-between gap-3 pt-1">
-              <p className="text-xs text-muted">We'll never sell your email.</p>
-              <button
-                type="button"
-                onClick={() => setMode('idle')}
-                className="text-xs text-muted underline underline-offset-4 decoration-line hover:text-ink focus:outline-none focus-visible:text-ink"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </motion.div>
-      )}
-
-      {mode === 'failed' && (
-        <div
-          role="alert"
-          className="rounded-lg border border-red-brand/40 bg-red-brand/5 px-4 py-3 text-sm text-red-brand"
-        >
-          Couldn't generate the PDF. Try again, or refresh the page if it
-          keeps happening.
-        </div>
-      )}
-
-      <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" onClick={onBack}>
-            ← Back
-          </Button>
-          <Button variant="ghost" onClick={onReset}>
-            Start over
-          </Button>
-        </div>
-        <Button
-          variant="gold"
-          onClick={handlePdfClick}
-          disabled={mode === 'preparing'}
-          aria-haspopup={leadEmail ? undefined : 'dialog'}
-          aria-expanded={mode === 'gate' ? true : undefined}
-        >
-          {mode === 'preparing' ? (
-            <>
-              <Spinner className="h-4 w-4" />
-              <span>Preparing PDF</span>
-            </>
-          ) : mode === 'failed' ? (
-            'Try again'
-          ) : (
-            'Download as PDF'
-          )}
-        </Button>
-      </div>
+    <div className="pt-2 flex items-center gap-2">
+      <Button variant="ghost" onClick={onBack}>
+        ← Back
+      </Button>
+      <Button variant="ghost" onClick={onReset}>
+        Start over
+      </Button>
     </div>
   );
 }
