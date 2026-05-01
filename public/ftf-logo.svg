@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="From The Farm">
+  <rect width="240" height="64" fill="none"/>
+  <g font-family="Oswald, system-ui, sans-serif" font-weight="700">
+    <text x="0" y="28" font-size="22" fill="#1B3A6B" letter-spacing="1">FROM THE</text>
+    <text x="0" y="56" font-size="30" fill="#B5965A" letter-spacing="2">FARM</text>
+  </g>
+</svg>
