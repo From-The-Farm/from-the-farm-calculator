@@ -71,7 +71,7 @@ export function Step1Animal() {
           helpText="Percent of live weight that becomes hanging carcass after slaughter. Typical: beef 62%, hog 72%, lamb/goat 50%, poultry 72–78%."
         >
           <NumberInput
-            value={Math.round(step1.carcassYield * 100)}
+            value={Number((step1.carcassYield * 100).toFixed(2))}
             onChange={(v) =>
               updateStep1({ carcassYield: Math.max(0, Math.min(100, v)) / 100 })
             }
