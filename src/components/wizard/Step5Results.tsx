@@ -227,62 +227,76 @@ function ResultScreen({
     return () => window.clearTimeout(t);
   }, [reduceMotion]);
 
-  return (
-    <StepShell
-      eyebrow={`Step 5 of 5 · ${profile.label} pricing`}
-      title="Your recommended price"
-      description="Here's the per-pound number we'd back, with the math behind it. Edit any cost to see it move in real time."
-    >
-      <Hero
-        result={result}
-        tier={tier}
-        animal={animal}
-        premium={premium}
-        highPrice={highPrice}
-        reduceMotion={reduceMotion}
-        onRevealComplete={onRevealComplete}
-        onEditMargin={() => onEditStep(4)}
-      />
+  const saveCardRef = useRef<HTMLDivElement>(null);
+  const sent = leadEmail.length > 0;
 
-      <RevealLayer revealed={revealed} className="mt-10 sm:mt-12 space-y-8">
-        <PricingOptions
-          tiers={tiers}
+  return (
+    <>
+      <StepShell
+        eyebrow={`Step 5 of 5 · ${profile.label} pricing`}
+        title="Your recommended price"
+        description="Here's the per-pound number we'd back, with the math behind it. Edit any cost to see it move in real time."
+      >
+        <Hero
+          result={result}
+          tier={tier}
+          animal={animal}
+          premium={premium}
+          highPrice={highPrice}
+          reduceMotion={reduceMotion}
+          onRevealComplete={onRevealComplete}
           onEditMargin={() => onEditStep(4)}
         />
 
-        <ShippingStrategyCard
-          shipping={shipping}
-          onEditShipping={() => onEditStep(2)}
-        />
-
-        {cutList && (
-          <CutList
-            cutList={cutList}
-            animal={animal}
-            onSetOverride={onSetCutOverride}
-            onResetOverrides={onResetCutOverrides}
+        <RevealLayer revealed={revealed} className="mt-10 sm:mt-12 space-y-8">
+          <PricingOptions
+            tiers={tiers}
+            onEditMargin={() => onEditStep(4)}
           />
-        )}
 
-        <CostBreakdown
-          slices={slices}
-          totalCosts={result.totalCosts}
-          onEditCosts={() => onEditStep(2)}
-        />
+          <ShippingStrategyCard
+            shipping={shipping}
+            onEditShipping={() => onEditStep(2)}
+          />
 
-        <ChannelComparisonCard channels={channels} animal={animal} />
+          {cutList && (
+            <CutList
+              cutList={cutList}
+              animal={animal}
+              onSetOverride={onSetCutOverride}
+              onResetOverrides={onResetCutOverrides}
+            />
+          )}
 
-        <SaveCard
-          leadEmail={leadEmail}
-          onLeadEmail={onLeadEmail}
-          onDownloadPdf={onDownloadPdf}
-        />
+          <CostBreakdown
+            slices={slices}
+            totalCosts={result.totalCosts}
+            onEditCosts={() => onEditStep(2)}
+          />
 
-        <Assumptions premium={premium} />
+          <ChannelComparisonCard channels={channels} animal={animal} />
 
-        <FooterActions onBack={onBack} onReset={onReset} />
-      </RevealLayer>
-    </StepShell>
+          <div ref={saveCardRef}>
+            <SaveCard
+              leadEmail={leadEmail}
+              onLeadEmail={onLeadEmail}
+              onDownloadPdf={onDownloadPdf}
+            />
+          </div>
+
+          <Assumptions premium={premium} />
+
+          <FooterActions onBack={onBack} onReset={onReset} />
+        </RevealLayer>
+      </StepShell>
+
+      <FloatingDownloadButton
+        saveCardRef={saveCardRef}
+        revealed={revealed}
+        sent={sent}
+        reduceMotion={reduceMotion}
+      />
+    </>
   );
 }
 
@@ -1361,5 +1375,79 @@ function FooterActions({
         Start over
       </Button>
     </div>
+  );
+}
+
+function FloatingDownloadButton({
+  saveCardRef,
+  revealed,
+  sent,
+  reduceMotion,
+}: {
+  saveCardRef: React.RefObject<HTMLDivElement>;
+  revealed: boolean;
+  sent: boolean;
+  reduceMotion: boolean;
+}) {
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const target = saveCardRef.current;
+    if (!target) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry?.isIntersecting ?? false),
+      { threshold: 0.2 },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [saveCardRef]);
+
+  const shouldShow = revealed && !inView && !sent;
+
+  const handleClick = () => {
+    const target = saveCardRef.current;
+    if (!target) return;
+    target.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
+    window.setTimeout(
+      () => {
+        const nameInput = target.querySelector<HTMLInputElement>(
+          'input[autocomplete="name"]',
+        );
+        nameInput?.focus({ preventScroll: true });
+      },
+      reduceMotion ? 50 : 600,
+    );
+  };
+
+  return (
+    <motion.div
+      className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40"
+      initial={false}
+      animate={{
+        y: shouldShow ? 0 : 80,
+        opacity: shouldShow ? 1 : 0,
+      }}
+      style={{ pointerEvents: shouldShow ? 'auto' : 'none' }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      aria-hidden={!shouldShow}
+    >
+      <button
+        type="button"
+        onClick={handleClick}
+        tabIndex={shouldShow ? 0 : -1}
+        className={cn(
+          'inline-flex items-center gap-2 h-12 px-6 rounded-full bg-gold text-white shadow-pop',
+          'font-heading uppercase tracking-wide text-sm font-semibold',
+          'transition-colors no-tap-highlight hover:bg-gold/90 active:bg-gold/95',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+        )}
+      >
+        <span aria-hidden="true">↓</span>
+        <span>Download PDF</span>
+      </button>
+    </motion.div>
   );
 }
