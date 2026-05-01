@@ -62,6 +62,7 @@ export function Step1Animal() {
             value={step1.liveWeight}
             onChange={(v) => updateStep1({ liveWeight: v })}
             suffix="lbs"
+            decimals
           />
         </Field>
 

@@ -186,6 +186,43 @@ export interface CostSlice {
   color: string;
 }
 
+export interface ShippingStrategy {
+  withShippingPricePerLb: number;
+  withoutShippingPricePerLb: number;
+  shippingPerPackage: number;
+  shippingPerLb: number;
+  averagePackageWeight: number;
+  bareMarginPct: number;
+  freeShippingThreshold: number | null;
+}
+
+export function buildShippingStrategy(
+  input: CalculatorInput,
+  result: CalculatorResult,
+): ShippingStrategy {
+  const premiumFactor = input.step1.premiumProduction ? PREMIUM_MULTIPLIER : 1;
+  const withoutShipping = result.targetPricePerLb * premiumFactor;
+  const withShipping = result.recommendedPricePerLb;
+  const totalLbs = result.totalPackagedLbs;
+  const costsExclShipping = result.costsForPricing;
+  const bareCostPerLb = totalLbs > 0 ? costsExclShipping / totalLbs : 0;
+  const bareMargin =
+    withoutShipping > 0 ? (withoutShipping - bareCostPerLb) / withoutShipping : 0;
+  const threshold =
+    bareMargin > 0 && result.shippingCostPerPkg > 0
+      ? result.shippingCostPerPkg / bareMargin
+      : null;
+  return {
+    withShippingPricePerLb: withShipping,
+    withoutShippingPricePerLb: withoutShipping,
+    shippingPerPackage: result.shippingCostPerPkg,
+    shippingPerLb: result.shippingCostPerLb,
+    averagePackageWeight: input.step2.shipping.avgPackageWeight,
+    bareMarginPct: bareMargin * 100,
+    freeShippingThreshold: threshold,
+  };
+}
+
 export interface Cut {
   id: string;
   name: string;

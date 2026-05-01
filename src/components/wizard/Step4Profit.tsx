@@ -56,6 +56,7 @@ export function Step4Profit() {
           >
             <NumberInput
               prefix="$"
+              decimals
               value={step4.profitDollar}
               onChange={(v) => updateStep4({ profitDollar: Math.max(0, v) })}
             />

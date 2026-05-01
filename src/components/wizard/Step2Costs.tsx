@@ -57,6 +57,7 @@ export function Step2Costs() {
               >
                 <NumberInput
                   prefix="$"
+                  decimals
                   value={step2.feedVet.feedCost}
                   onChange={(v) =>
                     updateStep2({ feedVet: { ...step2.feedVet, feedCost: Math.max(0, v) } })
@@ -69,6 +70,7 @@ export function Step2Costs() {
               >
                 <NumberInput
                   prefix="$"
+                  decimals
                   value={step2.feedVet.vetCost}
                   onChange={(v) =>
                     updateStep2({ feedVet: { ...step2.feedVet, vetCost: Math.max(0, v) } })
@@ -81,6 +83,7 @@ export function Step2Costs() {
               >
                 <NumberInput
                   suffix="hrs"
+                  decimals
                   value={step2.feedVet.laborHours}
                   onChange={(v) =>
                     updateStep2({ feedVet: { ...step2.feedVet, laborHours: Math.max(0, v) } })
@@ -94,6 +97,7 @@ export function Step2Costs() {
                 <NumberInput
                   prefix="$"
                   suffix="/hr"
+                  decimals
                   value={step2.feedVet.laborRate}
                   onChange={(v) =>
                     updateStep2({ feedVet: { ...step2.feedVet, laborRate: Math.max(0, v) } })
@@ -111,6 +115,7 @@ export function Step2Costs() {
               >
                 <NumberInput
                   prefix="$"
+                  decimals
                   value={step2.processing.killFee}
                   onChange={(v) =>
                     updateStep2({
@@ -144,6 +149,7 @@ export function Step2Costs() {
               >
                 <NumberInput
                   prefix="$"
+                  decimals
                   value={step2.processing.transportToProcessor}
                   onChange={(v) =>
                     updateStep2({
@@ -204,6 +210,7 @@ export function Step2Costs() {
               >
                 <NumberInput
                   prefix="$"
+                  decimals
                   value={step2.marketing.marketingFixed}
                   onChange={(v) =>
                     updateStep2({

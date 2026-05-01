@@ -15,12 +15,14 @@ import {
   buildCostSlices,
   buildCutList,
   buildPriceTiers,
+  buildShippingStrategy,
   calculate,
   type Cut,
   type CutGroup,
   type CutListResult,
   type CostSlice,
   type PriceTier,
+  type ShippingStrategy,
 } from '../../lib/calculator';
 import { ANIMAL_PROFILES } from '../../lib/animalDefaults';
 import {
@@ -92,6 +94,10 @@ export function Step5Results() {
   const slices = useMemo(() => buildCostSlices(result), [result]);
   const channels = useMemo(() => buildComparison(result), [result]);
   const tiers = useMemo(() => buildPriceTiers(input, result), [input, result]);
+  const shipping = useMemo(
+    () => buildShippingStrategy(input, result),
+    [input, result],
+  );
   const cutList = useMemo(
     () => buildCutList(animal, result, state.step5.cutOverrides),
     [animal, result, state.step5.cutOverrides],
@@ -114,6 +120,7 @@ export function Step5Results() {
       slices={slices}
       channels={channels}
       tiers={tiers}
+      shipping={shipping}
       cutList={cutList}
       animal={animal as AnimalKey}
       premium={state.step1.premiumProduction}
@@ -159,6 +166,7 @@ interface ResultScreenProps {
   slices: CostSlice[];
   channels: ChannelComparison[];
   tiers: { low: PriceTier; medium: PriceTier; high: PriceTier };
+  shipping: ShippingStrategy;
   cutList: CutListResult | null;
   animal: AnimalKey;
   premium: boolean;
@@ -177,6 +185,7 @@ function ResultScreen({
   slices,
   channels,
   tiers,
+  shipping,
   cutList,
   animal,
   premium,
@@ -238,6 +247,11 @@ function ResultScreen({
         <PricingOptions
           tiers={tiers}
           onEditMargin={() => onEditStep(4)}
+        />
+
+        <ShippingStrategyCard
+          shipping={shipping}
+          onEditShipping={() => onEditStep(2)}
         />
 
         {cutList && (
@@ -548,6 +562,120 @@ function PricingOptions({
           );
         })}
       </ul>
+    </section>
+  );
+}
+
+function ShippingStrategyCard({
+  shipping,
+  onEditShipping,
+}: {
+  shipping: ShippingStrategy;
+  onEditShipping: () => void;
+}) {
+  const hasViableThreshold =
+    shipping.freeShippingThreshold !== null &&
+    Number.isFinite(shipping.freeShippingThreshold) &&
+    shipping.freeShippingThreshold > 0;
+
+  const roundedThreshold = hasViableThreshold
+    ? Math.ceil((shipping.freeShippingThreshold as number) / 5) * 5
+    : null;
+
+  return (
+    <section className="rounded-lg border border-line bg-white shadow-card overflow-hidden">
+      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-3 border-b border-line flex items-center justify-between gap-3">
+        <h2 className="font-heading uppercase tracking-wide text-base sm:text-lg font-semibold text-navy">
+          Shipping strategy
+        </h2>
+        <button
+          type="button"
+          onClick={onEditShipping}
+          className="text-xs sm:text-sm text-muted hover:text-navy underline underline-offset-4 decoration-line focus:outline-none focus-visible:text-navy"
+        >
+          Edit shipping inputs
+        </button>
+      </div>
+
+      <ul className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-line">
+        <li className="px-5 sm:px-6 py-5 sm:py-6 flex flex-col gap-3 bg-gold/[0.06]">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold">
+              Free shipping (built in)
+            </span>
+            <span className="inline-flex items-center rounded-full bg-gold/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gold">
+              Recommended
+            </span>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-heading font-bold leading-none text-navy tabular-nums text-3xl sm:text-4xl">
+              {fmtCurrency2(shipping.withShippingPricePerLb)}
+            </span>
+            <span className="text-sm font-heading font-semibold text-muted">
+              / lb
+            </span>
+          </div>
+          <p className="text-sm text-ink leading-relaxed">
+            Shipping is baked into the per-pound price. Customers always see
+            <strong className="font-semibold"> free shipping</strong> on every
+            order. Best for retail listings and online marketplaces where a
+            single sticker price wins trust.
+          </p>
+        </li>
+
+        <li className="px-5 sm:px-6 py-5 sm:py-6 flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
+              Plus shipping
+            </span>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-heading font-bold leading-none text-navy tabular-nums text-3xl sm:text-4xl">
+              {fmtCurrency2(shipping.withoutShippingPricePerLb)}
+            </span>
+            <span className="text-sm font-heading font-semibold text-muted">
+              / lb
+            </span>
+            <span className="ml-2 text-xs text-muted">
+              + ~{fmtCurrency(shipping.shippingPerPackage)} per box
+            </span>
+          </div>
+          <p className="text-sm text-ink leading-relaxed">
+            Lower sticker price; customer pays shipping at checkout. Best for
+            wholesale, local pickup, or when buyers expect itemized shipping.
+          </p>
+        </li>
+      </ul>
+
+      <div className="border-t border-line bg-bg/40 px-5 sm:px-6 py-4">
+        {hasViableThreshold ? (
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted">
+              Free shipping over
+            </span>
+            <span className="text-xl sm:text-2xl font-heading font-bold text-navy tabular-nums">
+              {fmtCurrency(roundedThreshold as number)}
+            </span>
+            <span className="text-xs sm:text-sm text-muted">
+              At that order size, your{' '}
+              <strong className="text-ink font-semibold">
+                {fmtPct(shipping.bareMarginPct)}
+              </strong>{' '}
+              bare-price margin covers the average{' '}
+              <strong className="text-ink font-semibold">
+                {fmtCurrency(shipping.shippingPerPackage)}
+              </strong>{' '}
+              shipping cost per box.
+            </span>
+          </div>
+        ) : (
+          <p className="text-xs sm:text-sm text-red-brand">
+            At this margin and shipping cost, offering free shipping isn't
+            sustainable. Tighten costs above or raise your target margin in
+            Step 4.
+          </p>
+        )}
+      </div>
     </section>
   );
 }
