@@ -1423,31 +1423,34 @@ function FloatingDownloadButton({
   };
 
   return (
-    <motion.div
-      className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40"
-      initial={false}
-      animate={{
-        y: shouldShow ? 0 : 80,
-        opacity: shouldShow ? 1 : 0,
-      }}
-      style={{ pointerEvents: shouldShow ? 'auto' : 'none' }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      className="fixed bottom-4 sm:bottom-6 inset-x-0 flex justify-center z-40 pointer-events-none px-4"
       aria-hidden={!shouldShow}
     >
-      <button
-        type="button"
-        onClick={handleClick}
-        tabIndex={shouldShow ? 0 : -1}
-        className={cn(
-          'inline-flex items-center gap-2 h-12 px-6 rounded-full bg-gold text-white shadow-pop',
-          'font-heading uppercase tracking-wide text-sm font-semibold',
-          'transition-colors no-tap-highlight hover:bg-gold/90 active:bg-gold/95',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
-        )}
+      <motion.div
+        initial={false}
+        animate={{
+          y: shouldShow ? 0 : 80,
+          opacity: shouldShow ? 1 : 0,
+        }}
+        style={{ pointerEvents: shouldShow ? 'auto' : 'none' }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       >
-        <span aria-hidden="true">↓</span>
-        <span>Download PDF</span>
-      </button>
-    </motion.div>
+        <button
+          type="button"
+          onClick={handleClick}
+          tabIndex={shouldShow ? 0 : -1}
+          className={cn(
+            'inline-flex items-center gap-2 h-12 px-6 rounded-full bg-gold text-white shadow-pop',
+            'font-heading uppercase tracking-wide text-sm font-semibold',
+            'transition-colors no-tap-highlight hover:bg-gold/90 active:bg-gold/95',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+          )}
+        >
+          <span aria-hidden="true">↓</span>
+          <span>Download PDF</span>
+        </button>
+      </motion.div>
+    </div>
   );
 }
