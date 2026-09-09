@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A multi-year robotics learning plan for a ten-year-old: free resources, a $0 diagnostic first month, a phased roadmap to age 14, and a spend-on-evidence budget ladder.">
+<title>Building a Robotics Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --paper:#EDF0F1;
+  --surface:#F9FBFB;
+  --surface-2:#E3E8EA;
+  --ink:#16232E;
+  --ink-soft:#4A5D6B;
+  --ink-faint:#7C8D98;
+  --rule:#C6D0D5;
+  --rule-strong:#9FAFB7;
+  --blueprint:#1B4D6B;
+  --signal:#C9451B;
+  --signal-wash:#F7E4DC;
+  --copper:#8F5D28;
+  --moss:#376040;
+  --moss-wash:#DFE9E0;
+  --grid-line:rgba(27,77,107,.09);
+  --shadow:0 1px 2px rgba(22,35,46,.06);
+  --f-display:"Archivo",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F171D;
+    --surface:#16212A;
+    --surface-2:#1E2C36;
+    --ink:#E1E9ED;
+    --ink-soft:#9DAFBA;
+    --ink-faint:#728794;
+    --rule:#2A3B47;
+    --rule-strong:#3E5361;
+    --blueprint:#74B4D8;
+    --signal:#FF7C4D;
+    --signal-wash:#2E1B13;
+    --copper:#D3A063;
+    --moss:#7FB48A;
+    --moss-wash:#16261B;
+    --grid-line:rgba(116,180,216,.10);
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F171D;
+  --surface:#16212A;
+  --surface-2:#1E2C36;
+  --ink:#E1E9ED;
+  --ink-soft:#9DAFBA;
+  --ink-faint:#728794;
+  --rule:#2A3B47;
+  --rule-strong:#3E5361;
+  --blueprint:#74B4D8;
+  --signal:#FF7C4D;
+  --signal-wash:#2E1B13;
+  --copper:#D3A063;
+  --moss:#7FB48A;
+  --moss-wash:#16261B;
+  --grid-line:rgba(116,180,216,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1140px;margin:0 auto;padding:0 28px 96px}
+
+/* ---------- masthead ---------- */
+.mast{
+  border-bottom:2px solid var(--ink);
+  padding:56px 0 26px;
+  margin-bottom:6px;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:26px 26px;
+  background-position:center bottom;
+}
+.eyebrow{
+  font-family:var(--f-mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--signal);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:20px;
+}
+.eyebrow span:not(:last-child)::after{content:"";display:inline-block;width:1px;height:10px;background:var(--rule-strong);margin-left:10px;vertical-align:-1px}
+h1{
+  font-family:var(--f-display);font-weight:800;font-size:clamp(2.5rem,6.4vw,4.15rem);
+  line-height:.99;letter-spacing:-.028em;margin:0 0 18px;text-wrap:balance;max-width:16ch;
+}
+.dek{font-size:1.15rem;color:var(--ink-soft);max-width:62ch;margin:0 0 30px}
+.dek strong{color:var(--ink);font-weight:600}
+
+.meter{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  border:1px solid var(--rule);background:var(--surface);
+  padding:13px 18px;border-radius:2px;max-width:520px;box-shadow:var(--shadow);
+}
+.meter-label{font-family:var(--f-mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+.meter-track{flex:1;min-width:120px;height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.meter-fill{height:100%;width:0;background:var(--signal);border-radius:99px;transition:width .3s ease}
+.meter-count{font-family:var(--f-mono);font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ---------- sections ---------- */
+section{padding-top:60px}
+.sec-head{
+  display:grid;grid-template-columns:88px 1fr;gap:22px;align-items:baseline;
+  border-bottom:1px solid var(--rule-strong);padding-bottom:12px;margin-bottom:28px;
+}
+.sec-num{font-family:var(--f-mono);font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--signal);padding-top:6px}
+.sec-head h2{
+  font-family:var(--f-display);font-weight:700;font-size:clamp(1.45rem,3vw,2rem);
+  letter-spacing:-.018em;margin:0;text-wrap:balance;
+}
+.body-col{display:grid;grid-template-columns:88px minmax(0,1fr);gap:22px}
+.body-col > .rail{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);line-height:1.5}
+.col{min-width:0}
+p{margin:0 0 17px;max-width:68ch}
+.col > p:last-child{margin-bottom:0}
+strong{font-weight:600}
+em{font-style:italic;color:var(--ink-soft)}
+a{color:var(--blueprint);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;transition:color .12s,text-decoration-color .12s}
+a:hover{color:var(--signal);text-decoration-thickness:2px}
+a:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
+a.mono,a.url{font-family:var(--f-mono);word-break:break-word}
+td a,.card a,.week a,.phase a{text-decoration-color:color-mix(in srgb,var(--blueprint) 45%,transparent)}
+h4 a,.phase dd a strong,td strong a{color:inherit;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent)}
+h4 a:hover,td strong a:hover{color:var(--signal)}
+code,.mono{font-family:var(--f-mono);font-size:.87em}
+code{background:var(--surface-2);padding:1px 5px;border-radius:2px;color:var(--copper)}
+h3{font-family:var(--f-display);font-weight:700;font-size:1.12rem;letter-spacing:-.008em;margin:34px 0 12px}
+h3:first-child{margin-top:0}
+
+/* ---------- pull / alert ---------- */
+.alert{
+  border-left:4px solid var(--signal);background:var(--signal-wash);
+  padding:22px 26px;margin:0 0 4px;border-radius:0 2px 2px 0;
+}
+.alert-tag{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);display:block;margin-bottom:8px}
+.alert h3{margin:0 0 10px;font-size:1.24rem}
+.alert p{max-width:74ch}
+.alert p:last-child{margin-bottom:0}
+
+.note{border-left:3px solid var(--blueprint);padding:2px 0 2px 20px;margin:22px 0;color:var(--ink-soft)}
+.note p:last-child{margin-bottom:0}
+
+/* ---------- pillars ---------- */
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:0 0 22px}
+.pillar{background:var(--surface);padding:18px 18px 20px}
+.pillar .p-n{font-family:var(--f-mono);font-size:11px;font-weight:600;color:var(--blueprint);letter-spacing:.1em;display:block;margin-bottom:7px}
+.pillar h4{font-family:var(--f-display);font-weight:700;font-size:1.02rem;margin:0 0 7px;letter-spacing:-.005em}
+.pillar p{font-size:.92rem;line-height:1.5;margin:0;color:var(--ink-soft)}
+.pillar.meta{background:var(--surface-2)}
+.pillar.meta .p-n,.pillar.meta h4{color:var(--signal)}
+
+/* ---------- weeks / milestones ---------- */
+.weeks{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px;margin-bottom:26px}
+.week{border:1px solid var(--rule);background:var(--surface);padding:18px 18px 16px;border-radius:2px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.week-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.week-n{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.tag{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;padding:2.5px 7px;border-radius:2px;white-space:nowrap}
+.tag.free{background:var(--moss-wash);color:var(--moss);border:1px solid var(--moss)}
+.tag.cost{background:var(--surface-2);color:var(--copper);border:1px solid var(--rule-strong)}
+.week h4{font-family:var(--f-display);font-weight:700;font-size:1.06rem;margin:0;letter-spacing:-.008em}
+.week .q{font-size:.9rem;color:var(--ink-soft);font-style:italic;margin:0}
+.week ul{margin:0;padding-left:17px;font-size:.93rem;line-height:1.5;color:var(--ink-soft)}
+.week ul li{margin-bottom:5px}
+.week ul li:last-child{margin-bottom:0}
+
+/* checkable milestone */
+.ms{
+  display:flex;gap:10px;align-items:flex-start;margin-top:auto;
+  border-top:1px dashed var(--rule-strong);padding-top:12px;cursor:pointer;
+}
+.ms input{
+  appearance:none;-webkit-appearance:none;flex:0 0 auto;
+  width:17px;height:17px;margin:3px 0 0;border:1.5px solid var(--rule-strong);
+  border-radius:2px;background:var(--paper);cursor:pointer;position:relative;transition:background .15s,border-color .15s;
+}
+.ms input:checked{background:var(--signal);border-color:var(--signal)}
+.ms input:checked::after{
+  content:"";position:absolute;left:5px;top:1px;width:4.5px;height:9px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg);
+}
+.ms input:focus-visible{outline:2px solid var(--blueprint);outline-offset:2px}
+.ms-text{font-size:.9rem;line-height:1.45;color:var(--ink)}
+.ms-text b{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:2px}
+.ms input:checked ~ .ms-text{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--rule-strong)}
+
+/* ---------- phases ---------- */
+.phase{
+  border:1px solid var(--rule);border-left:4px solid var(--blueprint);
+  background:var(--surface);padding:24px 26px;margin-bottom:20px;border-radius:0 2px 2px 0;box-shadow:var(--shadow);
+}
+.phase-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:6px}
+.phase-n{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--blueprint)}
+.phase-age{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em;margin-left:auto}
+.phase h3{margin:0 0 10px;font-size:1.3rem}
+.phase .goal{font-size:1rem;color:var(--ink);margin-bottom:16px;max-width:70ch}
+.phase dl{margin:0 0 4px;display:grid;grid-template-columns:112px minmax(0,1fr);gap:6px 18px;align-items:baseline}
+.phase dt{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);padding-top:4px}
+.phase dd{margin:0;font-size:.96rem;color:var(--ink-soft);line-height:1.55}
+.phase dd strong{color:var(--ink)}
+.phase .ms{margin-top:18px}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:0 0 22px;border:1px solid var(--rule);background:var(--surface);border-radius:2px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.93rem}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.48}
+thead th{
+  font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-faint);background:var(--surface-2);border-bottom:1px solid var(--rule-strong);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td strong{color:var(--ink)}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--copper);font-size:.88rem}
+td.gate{font-family:var(--f-mono);font-size:.83rem;color:var(--ink-soft);line-height:1.45}
+.tier-0 td:first-child,.tier-0 td.n{color:var(--moss)}
+td .url{font-size:.82rem;color:var(--blueprint);word-break:break-word}
+
+/* ---------- ritual ---------- */
+.ritual{counter-reset:step;list-style:none;padding:0;margin:0 0 22px;border-top:1px solid var(--rule)}
+.ritual li{
+  counter-increment:step;display:grid;grid-template-columns:38px 1fr;gap:14px;
+  padding:13px 0;border-bottom:1px solid var(--rule);align-items:baseline;
+}
+.ritual li::before{
+  content:counter(step,decimal-leading-zero);font-family:var(--f-mono);font-size:11.5px;
+  font-weight:600;color:var(--signal);letter-spacing:.06em;
+}
+.ritual li span{font-size:1rem}
+
+/* ---------- projects ---------- */
+.projects{list-style:none;padding:0;margin:0 0 20px;border-top:1px solid var(--rule)}
+.projects li{border-bottom:1px solid var(--rule)}
+.projects label{display:grid;grid-template-columns:30px 1fr;gap:14px;padding:14px 2px;cursor:pointer;align-items:start}
+.projects input{
+  appearance:none;-webkit-appearance:none;width:17px;height:17px;margin:4px 0 0;
+  border:1.5px solid var(--rule-strong);border-radius:2px;background:var(--paper);cursor:pointer;position:relative;transition:background .15s,border-color .15s;
+}
+.projects input:checked{background:var(--signal);border-color:var(--signal)}
+.projects input:checked::after{content:"";position:absolute;left:5px;top:1px;width:4.5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg)}
+.projects input:focus-visible{outline:2px solid var(--blueprint);outline-offset:2px}
+.projects .pt{font-family:var(--f-display);font-weight:700;font-size:1rem;display:block;margin-bottom:1px}
+.projects .pd{font-size:.9rem;color:var(--ink-soft)}
+.projects input:checked ~ div .pt{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--rule-strong)}
+
+/* ---------- action list ---------- */
+.actions{counter-reset:act;list-style:none;padding:0;margin:0}
+.actions li{
+  counter-increment:act;display:grid;grid-template-columns:44px 1fr;gap:16px;
+  padding:16px 0;border-bottom:1px solid var(--rule);
+}
+.actions li:first-child{border-top:1px solid var(--rule-strong)}
+.actions li::before{
+  content:counter(act);font-family:var(--f-display);font-weight:800;font-size:1.4rem;
+  color:var(--rule-strong);line-height:1.15;
+}
+.actions p{margin:0;max-width:66ch}
+.actions .when{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--signal);display:block;margin-bottom:3px}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:22px}
+.card{border:1px solid var(--rule);background:var(--surface);padding:20px 22px;border-radius:2px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--f-display);font-weight:700;font-size:1.02rem;margin:0 0 8px}
+.card p{font-size:.94rem;margin:0;color:var(--ink-soft)}
+.card p + p{margin-top:10px}
+.card.warn{border-left:3px solid var(--signal)}
+.card.good{border-left:3px solid var(--moss)}
+
+ul.plain{padding-left:20px;margin:0 0 18px;max-width:68ch}
+ul.plain li{margin-bottom:9px}
+ul.plain li:last-child{margin-bottom:0}
+
+.res-group{margin-bottom:26px}
+.res-group > h3{margin-bottom:12px}
+
+footer{
+  margin-top:76px;padding-top:24px;border-top:2px solid var(--ink);
+  font-size:.86rem;color:var(--ink-faint);max-width:80ch;
+}
+footer p{max-width:none}
+
+@media (max-width:720px){
+  .wrap{padding:0 18px 72px}
+  body{font-size:16px}
+  .sec-head,.body-col{grid-template-columns:1fr;gap:8px}
+  .sec-num{padding-top:0}
+  .body-col > .rail{margin-bottom:4px}
+  .phase dl{grid-template-columns:1fr;gap:2px 0}
+  .phase dt{padding-top:10px}
+  .phase{padding:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+<style>
+html{color-scheme:light dark}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow"><span>Learning plan</span><span>Age 10 → 14</span><span>Researched September 2026</span></div>
+  <h1>Building a Robotics Engineer</h1>
+  <p class="dek">A multi-year plan for a ten-year-old who's interested in robotics — built around free resources, a <strong>$0 first month</strong>, and the four disciplines that actually make an engineer. Spend nothing until the diagnostic month is done.</p>
+  <div class="meter">
+    <span class="meter-label">Milestones</span>
+    <div class="meter-track"><div class="meter-fill" id="fill"></div></div>
+    <span class="meter-count" id="count">0 / 13</span>
+  </div>
+</header>
+
+<section id="urgent">
+  <div class="alert">
+    <span class="alert-tag">Time-sensitive — act this month</span>
+    <h3>The FIRST LEGO League era ends after this season</h3>
+    <p>LEGO Education has not renewed its partnership with FIRST. <strong>2026–27 is the final FIRST LEGO League season</strong> — and it is happening right now: kickoff was August 2026, tournaments run November through February, and teams are forming as you read this. If you want him to experience FLL, this is the last chance.</p>
+    <p>Afterwards, LEGO Education launches <strong>LEGO League</strong> in August 2027, and FIRST launches its own new K–8 programs in 2027. Both are unproven. <strong>VEX has announced no such discontinuity</strong> — for a ten-year-old planning several years out, VEX IQ is the more future-stable competition platform. See <a href="#competitions">section 04</a>.</p>
+  </div>
+</section>
+
+<section id="framing">
+  <div class="sec-head"><span class="sec-num">00</span><h2>The honest framing</h2></div>
+  <div class="body-col">
+    <div class="rail">Four pillars<br>+ one meta-skill</div>
+    <div class="col">
+      <p>Robotics engineering isn't one skill. It's four disciplines stacked on each other, plus one meta-skill that matters more than any of them.</p>
+      <div class="pillars">
+        <div class="pillar"><span class="p-n">01</span><h4>Mechanical</h4><p>How things move, hold together, transmit force. Gears, linkages, chassis, CAD.</p></div>
+        <div class="pillar"><span class="p-n">02</span><h4>Electronics</h4><p>Power, signals, sensors, actuators. Circuits, motors, voltage, breadboards.</p></div>
+        <div class="pillar"><span class="p-n">03</span><h4>Software</h4><p>The sense → decide → act loop. Scratch, then blocks, then Python.</p></div>
+        <div class="pillar"><span class="p-n">04</span><h4>Math &amp; physics</h4><p>The language the other three run on. Ratios now, trigonometry later.</p></div>
+        <div class="pillar meta"><span class="p-n">→</span><h4>Debugging</h4><p><em>The actual job.</em> Robots fail constantly. Isolate a variable. Test one thing.</p></div>
+      </div>
+      <p><strong>At ten, the goal is not to "learn robotics."</strong> The goal is to keep the fire lit — a kid still interested at thirteen beats a kid who was skilled at eleven and burned out — to go broad and shallow across all four pillars so he finds which one he loves, and to build the habit of finishing and documenting projects.</p>
+      <div class="note"><p>The guiding principle: <strong>a finished ugly robot beats an unfinished beautiful one.</strong> Ship small things often.</p></div>
+      <p>The single biggest predictor of whether he's still doing this at sixteen isn't talent. It's whether the early experience felt like <em>his</em> project or <em>your</em> project.</p>
+    </div>
+  </div>
+</section>
+
+<section id="kickstart">
+  <div class="sec-head"><span class="sec-num">01</span><h2>Do this first: the 30-day kickstart</h2></div>
+  <div class="body-col">
+    <div class="rail">Cost<br><span class="tag free">$0</span></div>
+    <div class="col">
+      <p><strong>Spend nothing for the first month.</strong> This isn't frugality — it's diagnosis. You're finding out <em>what kind of interested</em> he is before you spend money. Some kids are builders who tolerate code; some are coders who tolerate building. The kit you buy should match the kid you actually have.</p>
+      <p>Everything below is free, browser-based, and needs no hardware.</p>
+
+      <div class="weeks">
+        <div class="week">
+          <div class="week-top"><span class="week-n">Week 1</span><span class="tag free">Free</span></div>
+          <h4><a href="https://scratch.mit.edu" target="_blank" rel="noopener">Scratch</a></h4>
+          <p class="q">Does he like making things behave?</p>
+          <ul>
+            <li>Account at <a class="mono" href="https://scratch.mit.edu" target="_blank" rel="noopener">scratch.mit.edu</a> (parent-created under 13)</li>
+            <li>Three tutorials, then one original game</li>
+            <li>Stretch: Harvard's free <a href="https://cs50.harvard.edu/scratch" target="_blank" rel="noopener">CS50 Scratch</a></li>
+          </ul>
+          <label class="ms"><input type="checkbox" data-ms="w1"><span class="ms-text"><b>Milestone</b>A game with a score and a win condition, that he designed</span></label>
+        </div>
+        <div class="week">
+          <div class="week-top"><span class="week-n">Week 2</span><span class="tag free">Free</span></div>
+          <h4><a href="https://makecode.microbit.org" target="_blank" rel="noopener">micro:bit simulator</a></h4>
+          <p class="q">Does he like sensors?</p>
+          <ul>
+            <li><a class="mono" href="https://makecode.microbit.org" target="_blank" rel="noopener">makecode.microbit.org</a> — has a built-in simulator, <strong>no hardware needed</strong></li>
+            <li>Reaction timer, step counter, compass</li>
+          </ul>
+          <label class="ms"><input type="checkbox" data-ms="w2"><span class="ms-text"><b>Milestone</b>A program that reacts to a sensor — shake, tilt, or light</span></label>
+        </div>
+        <div class="week">
+          <div class="week-top"><span class="week-n">Week 3</span><span class="tag free">Free</span></div>
+          <h4><a href="https://www.vexrobotics.com/vexcode/vr" target="_blank" rel="noopener">VEXcode VR</a></h4>
+          <p class="q">Does he like robots specifically?</p>
+          <ul>
+            <li>A free virtual robot in the browser, no download</li>
+            <li>Drive it, then program it to run a maze</li>
+            <li>Loops and sensor conditions</li>
+          </ul>
+          <label class="ms"><input type="checkbox" data-ms="w3"><span class="ms-text"><b>Milestone</b>The robot completes a maze with no human input</span></label>
+        </div>
+        <div class="week">
+          <div class="week-top"><span class="week-n">Week 4</span><span class="tag free">Free</span></div>
+          <h4><a href="https://www.tinkercad.com" target="_blank" rel="noopener">Tinkercad</a></h4>
+          <p class="q">Does he like designing physical things?</p>
+          <ul>
+            <li>3D Design, Circuits and Codeblocks in one free tool</li>
+            <li>Circuits is a real simulator — burn out a virtual LED for free</li>
+          </ul>
+          <label class="ms"><input type="checkbox" data-ms="w4"><span class="ms-text"><b>Milestone</b>One 3D model, plus one working simulated circuit</span></label>
+        </div>
+      </div>
+
+      <h3>End of month: the diagnostic conversation</h3>
+      <p>Ask him — and watch, don't just listen:</p>
+      <ul class="plain">
+        <li><strong>Which week did he lose track of time?</strong></li>
+        <li>Which week did he ask to keep going past the timer?</li>
+        <li>Which week did he show someone else what he made, unprompted?</li>
+      </ul>
+      <p>That's where your money goes. If the answer is "none of them," that's real information too — robotics may be a passing interest, and at ten that is completely fine.</p>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="sec-head"><span class="sec-num">02</span><h2>The roadmap</h2></div>
+  <div class="body-col">
+    <div class="rail">Four phases<br>Age 10 → 14</div>
+    <div class="col">
+      <p>Move on when the milestone is done, not when the calendar says so. Some kids take two years on Phase 1. Some blow through it in three months.</p>
+
+      <div class="phase">
+        <div class="phase-head"><span class="phase-n">Phase 1 · Months 1–6</span><span class="phase-age">Age 10</span></div>
+        <h3>Blocks and first hardware</h3>
+        <p class="goal"><strong>Goal:</strong> the sense → decide → act loop becomes intuitive, and he owns a robot that reacts to the physical world.</p>
+        <dl>
+          <dt>Software</dt><dd>Continue Scratch; add <strong><a href="https://code.org" target="_blank" rel="noopener">Code.org</a></strong> CS Fundamentals, then CS Discoveries. Move from Scratch to MakeCode blocks on real hardware.</dd>
+          <dt>Hardware</dt><dd><strong><a href="https://www.sparkfun.com/sparkfun-inventor-s-kit-for-micro-bit-v2.html" target="_blank" rel="noopener">micro:bit v2 + SparkFun Inventor's Kit</a></strong> (~$50–60). Cheapest path to real sensors and motors, enormous free curriculum, and it runs blocks now and MicroPython later — so the board doesn't go obsolete when his skills grow.</dd>
+          <dt>Mechanical</dt><dd>Cardboard, hot glue, LEGO from the toy bin. Chassis design is a design skill, not a buying decision. <strong><a href="https://4-h.org/programs/robotics/" target="_blank" rel="noopener">4-H "Junk Drawer Robotics"</a></strong> builds robots from household items with no computer at all.</dd>
+          <dt>Math</dt><dd>Fractions, ratios and proportions, decimals, negatives, the coordinate plane, angles and area. <strong>Name the connection out loud:</strong> a gear ratio <em>is</em> a fraction; field position <em>is</em> a coordinate pair.</dd>
+        </dl>
+        <label class="ms"><input type="checkbox" data-ms="p1"><span class="ms-text"><b>Phase milestone</b>A robot that reacts to the world — a line follower or an obstacle-avoider</span></label>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head"><span class="phase-n">Phase 2 · Months 6–12</span><span class="phase-age">Age 10–11</span></div>
+        <h3>Text code and a team</h3>
+        <p class="goal"><strong>Goal:</strong> he writes real code in a text editor, and he builds alongside other kids.</p>
+        <dl>
+          <dt>Software</dt><dd>MakeCode blocks → <strong>MicroPython on the same micro:bit.</strong> Same board, same projects, new language — the least painful blocks-to-text jump available. Pair it with Al Sweigart's <a href="https://inventwithpython.com" target="_blank" rel="noopener"><em>Invent Your Own Computer Games with Python</em></a>, free online and explicitly written to be understood by ages 10–12.</dd>
+          <dt>Team</dt><dd><strong>Join one.</strong> See section 04 — this is the highest-value item in the whole plan.</dd>
+          <dt>CAD</dt><dd>Tinkercad → design a custom bracket or wheel, then print it. Use your library's makerspace rather than buying a printer.</dd>
+          <dt>Math</dt><dd>Pre-algebra: variables, expressions, solving for <em>x</em>, unit conversion.</dd>
+        </dl>
+        <label class="ms"><input type="checkbox" data-ms="p2"><span class="ms-text"><b>Phase milestone</b>A robot with a custom part he designed in CAD and had manufactured</span></label>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head"><span class="phase-n">Phase 3 · Year 2</span><span class="phase-age">Age 11–12</span></div>
+        <h3>Systems and intelligence</h3>
+        <p class="goal"><strong>Goal:</strong> he moves from "a board that runs my code" to "a computer that perceives."</p>
+        <dl>
+          <dt>Hardware</dt><dd>Raspberry Pi or ESP32 — networking, a camera, real compute.</dd>
+          <dt>Software</dt><dd>Python properly: functions, files, libraries. Introduce <strong>Git</strong>. Real engineers version their work; starting at eleven is a superpower.</dd>
+          <dt>Electronics</dt><dd>Breadboard → <strong>soldering</strong> (see section 08). His first solder project should have 5–15 joints and visibly do something — light up, buzz, or move.</dd>
+          <dt>AI</dt><dd><strong><a href="https://teachablemachine.withgoogle.com" target="_blank" rel="noopener">Teachable Machine</a></strong> — train an image, sound or pose model in an afternoon, no code. Then <strong><a href="https://machinelearningforkids.co.uk" target="_blank" rel="noopener">Machine Learning for Kids</a></strong> to wire a trained model into Scratch or Python.</dd>
+          <dt>Math</dt><dd>Algebra 1 track.</dd>
+        </dl>
+        <label class="ms"><input type="checkbox" data-ms="p3"><span class="ms-text"><b>Phase milestone</b>A robot that uses a camera, or a model he trained himself</span></label>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head"><span class="phase-n">Phase 4 · Year 3</span><span class="phase-age">Age 12–13</span></div>
+        <h3>Depth and identity</h3>
+        <p class="goal"><strong>Goal:</strong> he stops being "a kid who does robotics" and becomes "a kid who is building <em>this specific thing</em>."</p>
+        <dl>
+          <dt>Specialize</dt><dd>By now he'll lean mechanical, electrical, software or AI. Let him. Depth in one pillar plus literacy in the others is exactly how real engineers are shaped.</dd>
+          <dt>CAD</dt><dd>Graduate Tinkercad → <strong><a href="https://www.onshape.com/en/education/" target="_blank" rel="noopener">Onshape</a></strong>: professional parametric CAD, free education plan.</dd>
+          <dt>Simulation</dt><dd><strong><a href="https://cyberbotics.com" target="_blank" rel="noopener">Webots</a></strong> (free, open-source, used in industry and research) and <a class="mono" href="https://robotbenchmark.net" target="_blank" rel="noopener">robotbenchmark.net</a> — program simulated robots in Python in the browser. This is what university robotics actually looks like.</dd>
+          <dt>Math</dt><dd>Algebra 2, geometry, intro trigonometry. <strong>Trig is the gate</strong> — arms, turning geometry and kinematics are all trig, and this is where kids get filtered out of robotics.</dd>
+          <dt>Publish</dt><dd><strong><a href="https://coolestprojects.com" target="_blank" rel="noopener">Coolest Projects</a></strong> — a free, worldwide, non-competitive showcase. An ideal first public demo.</dd>
+        </dl>
+        <label class="ms"><input type="checkbox" data-ms="p4"><span class="ms-text"><b>Phase milestone</b>An original robot solving a problem <em>he</em> chose, documented publicly</span></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="rhythm">
+  <div class="sec-head"><span class="sec-num">03</span><h2>The weekly rhythm</h2></div>
+  <div class="body-col">
+    <div class="rail">~4–5 hrs<br>per week</div>
+    <div class="col">
+      <p>What works is <strong>short and frequent, plus one long block.</strong> Build sessions need setup and cleanup time; code sessions don't.</p>
+      <div class="tw"><table>
+        <thead><tr><th>When</th><th>Length</th><th>What</th></tr></thead>
+        <tbody>
+          <tr><td><strong>2 weeknights</strong></td><td class="n">45 min</td><td>Code, tutorials, simulator work</td></tr>
+          <tr><td><strong>1 weekend block</strong></td><td class="n">2 hours</td><td>Physical building — needs the table and the mess</td></tr>
+          <tr><td><strong>Every day</strong></td><td class="n">15 min</td><td>Khan Academy math</td></tr>
+          <tr><td><strong>Monthly</strong></td><td class="n">30 min</td><td>Demo night — he shows the family what he built</td></tr>
+        </tbody>
+      </table></div>
+      <p>Resist going higher at this age. Over-scheduling is the number one way this ends.</p>
+      <div class="note"><p><strong>Demo night is not optional.</strong> A recurring, low-stakes deadline is what converts "things I'm tinkering with" into "things I finished." It's also where he practises explaining technical work to non-technical people — which is, unglamorously, most of an engineer's actual job.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="competitions">
+  <div class="sec-head"><span class="sec-num">04</span><h2>Competitions and clubs</h2></div>
+  <div class="body-col">
+    <div class="rail">Highest<br>leverage</div>
+    <div class="col">
+      <p><strong>Joining a team is the single highest-leverage move in this document.</strong> It supplies deadlines, peers, an adult who isn't you, and a reason to finish things. If you do only one thing from this plan, do this one.</p>
+      <p>Note the timing caveat in the banner at the top: FLL's final season is underway now, and VEX IQ is the more durable long-term bet.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Program</th><th>Ages / grades</th><th>Rough cost</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong><a href="https://www.vexrobotics.com/iq/competition/viqc-current-game" target="_blank" rel="noopener">VEX IQ</a></strong> (VIQRC)</td><td>Elementary = below 6th grade</td><td class="n">Kit ~$400+<br>+ reg &amp; events</td><td>2026–27 game: <strong>"Level Up."</strong> Most future-stable. He's elementary division; elementary students may play up to middle school</td></tr>
+          <tr><td><strong><a href="https://firstlegoleague.org/" target="_blank" rel="noopener">FIRST LEGO League</a></strong> Challenge</td><td>Ages 9–16 (~grades 4–8)</td><td class="n">~$285 reg<br>+ set + events</td><td><strong>Final season ever.</strong> 2026–27 season is underway now</td></tr>
+          <tr><td><strong><a href="https://4-h.org/programs/robotics/" target="_blank" rel="noopener">4-H Robotics</a></strong></td><td>Varies</td><td class="n">~$20–100/yr</td><td><strong>Cheapest real club.</strong> Strong in rural and farming communities — call your county extension office</td></tr>
+          <tr><td><strong><a href="https://seaperch.org/" target="_blank" rel="noopener">SeaPerch</a></strong></td><td>Middle school+</td><td class="n">Low</td><td>Underwater ROV. Superb hands-on build, very different flavour</td></tr>
+          <tr><td><strong><a href="https://www.robofest.net/" target="_blank" rel="noopener">Robofest</a></strong></td><td>Elementary+</td><td class="n">~$100</td><td>Autonomous robots, platform-agnostic</td></tr>
+          <tr><td><strong><a href="https://www.roborave.org/" target="_blank" rel="noopener">RoboRAVE</a></strong> / <a href="https://www.thenrc.org/" target="_blank" rel="noopener">National Robotics Challenge</a></td><td>Varies</td><td class="n">Low–moderate</td><td>No required kit — build from anything</td></tr>
+          <tr><td><strong><a href="https://www.makewonder.com/robotics-competition/" target="_blank" rel="noopener">Wonder League</a></strong></td><td>Elementary &amp; middle</td><td class="n">Low</td><td>Good entry point for younger kids</td></tr>
+          <tr class="tier-0"><td><strong><a href="https://codeclub.org" target="_blank" rel="noopener">Code Club</a></strong> / <a href="https://coderdojo.com/" target="_blank" rel="noopener">CoderDojo</a></td><td>Ages 7–17</td><td class="n">Free</td><td>Raspberry Pi Foundation. Free coding clubs worldwide</td></tr>
+          <tr class="tier-0"><td><strong><a href="https://coolestprojects.com" target="_blank" rel="noopener">Coolest Projects</a></strong></td><td>Any</td><td class="n">Free</td><td>A showcase, not a competition. Great first public demo</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="grid2">
+        <div class="card">
+          <h4>How to find something local</h4>
+          <p>1. <strong>Call your county 4-H extension office</strong> — cheapest path to a real club, and they'll know what else exists locally.<br>
+          2. Search <a class="mono" href="https://www.firstinspires.org" target="_blank" rel="noopener">firstinspires.org</a> and <a class="mono" href="https://www.robotevents.com" target="_blank" rel="noopener">robotevents.com</a> for nearby teams.<br>
+          3. Ask his school — many have teams that don't advertise.<br>
+          4. Check the public library; many run makerspaces and clubs.<br>
+          5. <a href="https://robotics.nasa.gov/robotic-competitions/" target="_blank" rel="noopener">NASA's Robotics Alliance Project</a> keeps a competition directory.</p>
+        </div>
+        <div class="card good">
+          <h4>If there's no team near you, start one</h4>
+          <p>Both FLL and VEX support new teams. You need two to ten kids and one adult coach.</p>
+          <p><strong>You do not need to know robotics to coach.</strong> You need to book a room, keep a schedule, and ask good questions — the kids figure out the robot. Recruit two other families and you have a team.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="budget">
+  <div class="sec-head"><span class="sec-num">05</span><h2>The budget ladder</h2></div>
+  <div class="body-col">
+    <div class="rail">Spend on<br>evidence</div>
+    <div class="col">
+      <p>The most common and most expensive mistake is buying Tier 3 first. <strong>A $400 kit does not create interest. It creates guilt</strong> — his, for not using it, and yours, for having bought it.</p>
+      <p>Each tier has a <strong>gate</strong>. Don't move up until the gate is met.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Tier</th><th>Cost</th><th>What</th><th>Gate to unlock</th></tr></thead>
+        <tbody>
+          <tr class="tier-0"><td><strong>0</strong></td><td class="n">$0</td><td>The 30-day kickstart. Scratch, MakeCode, VEXcode VR, Tinkercad</td><td class="gate">Start here. No exceptions.</td></tr>
+          <tr><td><strong>1</strong></td><td class="n">~$50–60</td><td><a href="https://www.sparkfun.com/sparkfun-inventor-s-kit-for-micro-bit-v2.html" target="_blank" rel="noopener">micro:bit v2 + SparkFun Inventor's Kit</a></td><td class="gate">He finished the 30 days and <strong>asked</strong> for more</td></tr>
+          <tr><td><strong>2</strong></td><td class="n">~$100–160</td><td>Motors &amp; chassis (<a href="https://www.sparkfun.com/sparkfun-micro-bot-kit-for-micro-bit-v2-0.html" target="_blank" rel="noopener">micro:bot kit</a>), or <a href="https://us.elegoo.com/collections/arduino-kits" target="_blank" rel="noopener">Elegoo</a>: UNO Basic Starter (~$20) / ESP-32 Super Starter (~$36) / Smart Robot Car V4 (~$76)</td><td class="gate">He completed 3+ hardware projects <strong>without being prompted</strong></td></tr>
+          <tr><td><strong>3</strong></td><td class="n">~$300–500</td><td>Team registration + competition kit (<a href="https://www.vexrobotics.com/iq/products/kits-bundles-1" target="_blank" rel="noopener">VEX IQ</a> or SPIKE Prime), or a 3D printer</td><td class="gate">Sustained 6+ months, and he wants to compete</td></tr>
+          <tr><td><strong>4</strong></td><td class="n">Your time</td><td>Driving to meetings, sitting through tournaments, learning alongside him</td><td class="gate">This is the real investment — and the one that actually matters</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Ways to spend less</h3>
+      <ul class="plain">
+        <li><strong>Library makerspaces</strong> — 3D printing and laser cutting, often free. Use these instead of buying a printer for at least two years</li>
+        <li><strong>School STEM lab</strong> — ask what's sitting unused</li>
+        <li><strong>Borrow from a local team</strong> — teams often have spare kits between seasons</li>
+        <li><strong>Buy used</strong> — VEX IQ and LEGO kits hold up well and turn over secondhand when teams graduate</li>
+        <li><strong>Financial aid</strong> — most competitions offer it and most teams fundraise. Ask; it's normal and expected</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="math">
+  <div class="sec-head"><span class="sec-num">06</span><h2>The math track — the part everyone skips</h2></div>
+  <div class="body-col">
+    <div class="rail">15 min<br>per day</div>
+    <div class="col">
+      <p><strong>Kids don't quit robotics because they stop liking robots. They quit because the math got ahead of them.</strong> Robotics engineering is applied mathematics with a battery attached.</p>
+      <p>Fifteen minutes a day on <a href="https://www.khanacademy.org" target="_blank" rel="noopener">Khan Academy</a> is enough. The dose matters less than the consistency.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Age</th><th>Topics</th><th>Why it's robot math</th></tr></thead>
+        <tbody>
+          <tr><td class="n">10–11</td><td>Fractions, ratios, proportions, decimals, negatives, coordinate plane, angles, area</td><td>Gear ratios <em>are</em> fractions. Field position <em>is</em> coordinates. Turning <em>is</em> angles</td></tr>
+          <tr><td class="n">11–12</td><td>Pre-algebra: variables, expressions, solving equations, unit conversion</td><td>A variable in code and a variable in algebra are the same idea</td></tr>
+          <tr><td class="n">12–14</td><td>Algebra 1, geometry, intro trigonometry</td><td><strong>Trig is the gate.</strong> Arms, turning geometry, kinematics</td></tr>
+          <tr><td class="n">14+</td><td>Algebra 2, precalculus, calculus, linear algebra, physics</td><td>Control theory, computer vision, dynamics</td></tr>
+        </tbody>
+      </table></div>
+      <h3>The technique that makes this work</h3>
+      <p>Every time he hits a robot problem, name the math out loud.</p>
+      <div class="note"><p><em>"Your robot overshoots the line by about 20% every time. That's a ratio problem — what if we scaled the motor power by the same fraction?"</em></p></div>
+      <p>Do that a hundred times and math stops being a school subject and becomes a tool he reaches for.</p>
+    </div>
+  </div>
+</section>
+
+<section id="parent">
+  <div class="sec-head"><span class="sec-num">07</span><h2>The parent playbook</h2></div>
+  <div class="body-col">
+    <div class="rail">Your job</div>
+    <div class="col">
+      <h3>The highest-leverage thing you can do: don't fix his bugs</h3>
+      <p>When he's stuck, you will know the answer before he does. <strong>Do not say it.</strong> Ask these five questions instead — this is the debugging ritual, and it is the entire career in five lines.</p>
+      <ol class="ritual">
+        <li><span>What did you expect to happen?</span></li>
+        <li><span>What actually happened?</span></li>
+        <li><span>What's different between those two?</span></li>
+        <li><span>What's the smallest test that tells you which part is wrong?</span></li>
+        <li><span>Change <strong>one</strong> thing. Test it. Repeat.</span></li>
+      </ol>
+      <p>A ten-year-old who internalises this is doing what professional engineers do all day. A ten-year-old whose dad fixes the robot has a working robot and no skill.</p>
+
+      <h3>Rules of thumb</h3>
+      <ul class="plain">
+        <li><strong>Let him choose the projects.</strong> Interest beats curriculum, every time</li>
+        <li><strong>Never say "that's too hard," and never say "I was bad at math."</strong> Kids inherit that instantly and permanently</li>
+        <li><strong>Ship small, ship often.</strong> A five-line program that makes a sprite dance today beats an ambitious robot still half-built in March</li>
+        <li><strong>Document everything.</strong> Photos, a build journal, short videos. A three-year portfolio at thirteen is genuinely extraordinary — for programs, for scholarships, and for his own sense of momentum</li>
+        <li><strong>Learn alongside him.</strong> You need to know none of this. "I don't know, let's find out" is the correct and best answer</li>
+        <li><strong>Take breaks.</strong> A walk around the block resets a frustrated kid faster than another twenty minutes of trying</li>
+        <li><strong>Celebrate the failures that taught something.</strong> The robot that caught fire is a better story and a better lesson than the one that worked first try</li>
+      </ul>
+
+      <h3>Know the difference between two kinds of frustrated</h3>
+      <div class="grid2">
+        <div class="card good">
+          <h4>Frustrated and leaning in</h4>
+          <p>Jaw set, still trying things.</p>
+          <p><strong>Sit with him. Don't touch anything.</strong> This is learning happening in real time.</p>
+        </div>
+        <div class="card warn">
+          <h4>Frustrated and shutting down</h4>
+          <p>Pushing the robot away. "This is stupid."</p>
+          <p><strong>Stop.</strong> Snack, walk, come back tomorrow. Pushing through this one costs you months.</p>
+        </div>
+      </div>
+
+      <h3>Warning signs, and how to adapt</h3>
+      <div class="tw"><table>
+        <thead><tr><th>What you see</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td>Only wants to build, never code</td><td>Fine. Lean mechanical. Code will arrive when a build needs it</td></tr>
+          <tr><td>Only wants to code, never build</td><td>Fine. Use simulators — <a href="https://www.vexrobotics.com/vexcode/vr" target="_blank" rel="noopener">VEXcode VR</a>, <a href="https://cyberbotics.com" target="_blank" rel="noopener">Webots</a>. Hardware can come later</td></tr>
+          <tr><td>Interest drops for 3+ weeks</td><td><strong>Back off completely.</strong> Don't push, don't guilt. Interest usually returns if it isn't forced — pressure is what kills it permanently</td></tr>
+          <tr><td>Races ahead of the plan</td><td>Let him. Skip phases. Get him onto a team with older kids as fast as possible</td></tr>
+          <tr><td>Wants to quit entirely</td><td>Let him, cleanly and without disappointment. He's ten. The skills transfer to whatever's next</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="sec-head"><span class="sec-num">08</span><h2>Safety</h2></div>
+  <div class="body-col">
+    <div class="rail">Non-<br>negotiable</div>
+    <div class="col">
+      <div class="grid2">
+        <div class="card warn">
+          <h4>Soldering</h4>
+          <p>Appropriate from around age 10 with close supervision. Readiness is about fine motor control and maturity with hot tools, not birthdays.</p>
+          <p>Lead-free solder · ventilated area or fume fan · safety glasses always · <strong>the iron always returns to the stand</strong>, enforced absolutely from the first minute. First project: 5–15 through-hole joints, and it must visibly work when finished.</p>
+        </div>
+        <div class="card warn">
+          <h4>Electrical</h4>
+          <p>Battery and USB voltages only. No mains wiring, ever. Never leave LiPo batteries charging unattended.</p>
+        </div>
+        <div class="card warn">
+          <h4>Tools &amp; printers</h4>
+          <p>Safety glasses for any cutting or drilling; an adult operates anything that spins fast. 3D printer hot ends and heated beds cause real burns — supervise and ventilate.</p>
+        </div>
+        <div class="card">
+          <h4>Online accounts (COPPA)</h4>
+          <p>Under-13 accounts on Scratch and Tinkercad need parent setup. <strong>Onshape requires 13+</strong>, or a school or qualified adult authorising the account. Check each platform's under-13 policy as you go.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="sec-head"><span class="sec-num">09</span><h2>His first five projects</h2></div>
+  <div class="body-col">
+    <div class="rail">In order</div>
+    <div class="col">
+      <p>Concrete, in sequence. Each one: build it, break it, fix it, and film a 30-second demo.</p>
+      <ul class="projects">
+        <li><label><input type="checkbox" data-ms="j1"><div><span class="pt">Reaction timer</span><span class="pd">micro:bit, blocks — input, timing, display</span></div></label></li>
+        <li><label><input type="checkbox" data-ms="j2"><div><span class="pt">Line-following robot</span><span class="pd">micro:bit + motor board — sensors and a control loop</span></div></label></li>
+        <li><label><input type="checkbox" data-ms="j3"><div><span class="pt">Obstacle-avoiding rover</span><span class="pd">Decision logic and state</span></div></label></li>
+        <li><label><input type="checkbox" data-ms="j4"><div><span class="pt">A custom 3D-printed bracket for the rover</span><span class="pd">Tinkercad — CAD, tolerances, iteration</span></div></label></li>
+        <li><label><input type="checkbox" data-ms="j5"><div><span class="pt">AI-triggered robot</span><span class="pd">Teachable Machine driving the robot — what modern robotics actually is</span></div></label></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="sec-head"><span class="sec-num">10</span><h2>Free resource directory</h2></div>
+  <div class="body-col">
+    <div class="rail">All free</div>
+    <div class="col">
+      <div class="res-group">
+        <h3>Programming</h3>
+        <div class="tw"><table>
+          <thead><tr><th>Resource</th><th>Where</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Scratch</strong></td><td><a class="url" href="https://scratch.mit.edu" target="_blank" rel="noopener">scratch.mit.edu</a></td><td>MIT. The universal starting point</td></tr>
+            <tr><td><strong>CS50 Scratch</strong></td><td><a class="url" href="https://cs50.harvard.edu/scratch" target="_blank" rel="noopener">cs50.harvard.edu/scratch</a></td><td>Harvard, free. The gentlest real CS intro</td></tr>
+            <tr><td><strong>Code.org</strong></td><td><a class="url" href="https://code.org" target="_blank" rel="noopener">code.org</a></td><td>CS Fundamentals + CS Discoveries, full free curriculum</td></tr>
+            <tr><td><strong>Khan Academy</strong></td><td><a class="url" href="https://www.khanacademy.org" target="_blank" rel="noopener">khanacademy.org</a></td><td>Math <em>and</em> intro programming</td></tr>
+            <tr><td><strong>Invent With Python</strong></td><td><a class="url" href="https://inventwithpython.com" target="_blank" rel="noopener">inventwithpython.com</a></td><td>Al Sweigart's books, free under Creative Commons. <em>Invent Your Own Computer Games</em> is written for ages 10–12</td></tr>
+            <tr><td><strong>Automate the Boring Stuff</strong></td><td><a class="url" href="https://automatetheboringstuff.com" target="_blank" rel="noopener">automatetheboringstuff.com</a></td><td>Free online — the practical follow-on</td></tr>
+            <tr><td><strong>CS Unplugged</strong></td><td><a class="url" href="https://www.csunplugged.org/en/" target="_blank" rel="noopener">csunplugged.org</a></td><td>Computer science with no computer — cards, string, running around</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="res-group">
+        <h3>Robotics &amp; electronics</h3>
+        <div class="tw"><table>
+          <thead><tr><th>Resource</th><th>Where</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>micro:bit MakeCode</strong></td><td><a class="url" href="https://makecode.microbit.org" target="_blank" rel="noopener">makecode.microbit.org</a></td><td><strong>Built-in simulator — no hardware needed</strong></td></tr>
+            <tr><td><strong>micro:bit Foundation</strong></td><td><a class="url" href="https://microbit.org" target="_blank" rel="noopener">microbit.org</a></td><td>Free lessons and classroom activities</td></tr>
+            <tr><td><strong>SparkFun Learn</strong></td><td><a class="url" href="https://learn.sparkfun.com" target="_blank" rel="noopener">learn.sparkfun.com</a></td><td>Excellent free tutorials — 23+ on micro:bit alone</td></tr>
+            <tr><td><strong>Adafruit Learning System</strong></td><td><a class="url" href="https://learn.adafruit.com" target="_blank" rel="noopener">learn.adafruit.com</a></td><td>Deep, well-written electronics guides</td></tr>
+            <tr><td><strong>Raspberry Pi Projects</strong></td><td><a class="url" href="https://projects.raspberrypi.org/en/projects" target="_blank" rel="noopener">projects.raspberrypi.org</a></td><td>250+ free step-by-step projects</td></tr>
+            <tr><td><strong>Tinkercad</strong></td><td><a class="url" href="https://www.tinkercad.com" target="_blank" rel="noopener">tinkercad.com</a></td><td>Free 3D design + a full circuit simulator + Codeblocks</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="res-group">
+        <h3>Simulators — robotics with zero hardware</h3>
+        <div class="tw"><table>
+          <thead><tr><th>Resource</th><th>Where</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>VEXcode VR</strong></td><td><a class="url" href="https://www.vexrobotics.com/vexcode/vr" target="_blank" rel="noopener">vexrobotics.com/vexcode/vr</a></td><td>Browser-based virtual robot. Blocks → Python</td></tr>
+            <tr><td><strong>Webots</strong></td><td><a class="url" href="https://cyberbotics.com" target="_blank" rel="noopener">cyberbotics.com</a></td><td>Free, open-source, used in industry and research</td></tr>
+            <tr><td><strong>robotbenchmark</strong></td><td><a class="url" href="https://robotbenchmark.net" target="_blank" rel="noopener">robotbenchmark.net</a></td><td>Webots in the browser, Python, free challenges</td></tr>
+            <tr><td><strong>Gears / GearsBot</strong></td><td><a class="url" href="https://gears.aposteriori.com.sg" target="_blank" rel="noopener">gears.aposteriori.com.sg</a></td><td>Blocks that auto-convert to Python</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="res-group">
+        <h3>AI &amp; CAD</h3>
+        <div class="tw"><table>
+          <thead><tr><th>Resource</th><th>Where</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Teachable Machine</strong></td><td><a class="url" href="https://teachablemachine.withgoogle.com" target="_blank" rel="noopener">teachablemachine.withgoogle.com</a></td><td>Google. Train a model in an afternoon, no code</td></tr>
+            <tr><td><strong>Machine Learning for Kids</strong></td><td><a class="url" href="https://machinelearningforkids.co.uk" target="_blank" rel="noopener">machinelearningforkids.co.uk</a></td><td>Wire trained models into Scratch and Python</td></tr>
+            <tr><td><strong>Onshape Education</strong></td><td><a class="url" href="https://www.onshape.com/en/education/" target="_blank" rel="noopener">onshape.com/en/education</a></td><td>Free education plan. Professional parametric CAD. 13+, or adult-authorised</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="res-group">
+        <h3>Clubs &amp; competitions</h3>
+        <div class="tw"><table>
+          <thead><tr><th>Resource</th><th>Where</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Code Club</strong></td><td><a class="url" href="https://codeclub.org" target="_blank" rel="noopener">codeclub.org</a></td><td>Free clubs worldwide</td></tr>
+            <tr><td><strong>4-H Robotics</strong></td><td><a class="url" href="https://4-h.org/programs/robotics/" target="_blank" rel="noopener">4-h.org/programs/robotics</a></td><td>Contact your county extension office</td></tr>
+            <tr><td><strong>FIRST</strong></td><td><a class="url" href="https://www.firstinspires.org" target="_blank" rel="noopener">firstinspires.org</a></td><td>FLL and beyond</td></tr>
+            <tr><td><strong>RECF / VEX</strong></td><td><a class="url" href="https://recf.org" target="_blank" rel="noopener">recf.org</a> · <a class="url" href="https://www.robotevents.com" target="_blank" rel="noopener">robotevents.com</a></td><td>Find local VEX events and teams</td></tr>
+            <tr><td><strong>NASA Robotics Alliance</strong></td><td><a class="url" href="https://robotics.nasa.gov/robotic-competitions/" target="_blank" rel="noopener">robotics.nasa.gov/robotic-competitions</a></td><td>Competition directory</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="thisweek">
+  <div class="sec-head"><span class="sec-num">11</span><h2>What to do this week</h2></div>
+  <div class="body-col">
+    <div class="rail">Start here</div>
+    <div class="col">
+      <ol class="actions">
+        <li><p><span class="when">Tonight</span>Open <a class="mono" href="https://scratch.mit.edu" target="_blank" rel="noopener">scratch.mit.edu</a> together and make something for thirty minutes. Nothing else.</p></li>
+        <li><p><span class="when">This week</span>Start the 30-day kickstart. Put the four weeks on the calendar.</p></li>
+        <li><p><span class="when">This week — time-sensitive</span>Call your county 4-H extension office, and search <a class="mono" href="https://www.robotevents.com" target="_blank" rel="noopener">robotevents.com</a> and <a class="mono" href="https://www.firstinspires.org" target="_blank" rel="noopener">firstinspires.org</a> for teams near you. The 2026–27 season is already underway and it's the last FLL season ever. Teams form in August and September.</p></li>
+        <li><p><span class="when">Start now</span>Begin the fifteen-minutes-a-day <a href="https://www.khanacademy.org" target="_blank" rel="noopener">Khan Academy</a> habit. It compounds, and it's the thing still paying off in six years.</p></li>
+        <li><p><span class="when">Until the 30 days are done</span>Buy nothing.</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Sources:</strong> firstinspires.org · LEGO Education · VEX Robotics / RECF · Raspberry Pi Foundation · SparkFun · Al Sweigart / Invent With Python · Autodesk Tinkercad · Onshape · National 4-H Council · NASA Robotics Alliance Project · Harvard CS50 · Code.org · CS Unplugged · Google Teachable Machine.</p>
+  <p>Researched September 2026. Prices and season dates are approximate — verify before buying or registering. Milestone ticks are saved in this browser only.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY="rbx.milestones.v1";
+  var boxes=Array.prototype.slice.call(document.querySelectorAll("input[type=checkbox][data-ms]"));
+  var fill=document.getElementById("fill");
+  var count=document.getElementById("count");
+
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){ return {}; }
+  }
+  function save(state){
+    try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){}
+  }
+  function render(){
+    var done=boxes.filter(function(b){return b.checked;}).length;
+    var total=boxes.length;
+    count.textContent=done+" / "+total;
+    fill.style.width=(total?(done/total*100):0)+"%";
+  }
+
+  var state=load();
+  boxes.forEach(function(b){
+    if(state[b.dataset.ms]) b.checked=true;
+    b.addEventListener("change",function(){
+      var s=load();
+      if(b.checked){ s[b.dataset.ms]=1; } else { delete s[b.dataset.ms]; }
+      save(s);
+      render();
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -37,7 +37,7 @@ Everything below is free, browser-based, and needs no hardware.
 ### Week 1 — Scratch (does he like making things behave?)
 - Make a Scratch account at **scratch.mit.edu** (parent-created for under-13s)
 - Do 3 starter tutorials, then make one original game
-- Optional stretch: Harvard's free **CS50 Scratch** course at `cs50.harvard.edu/scratch`
+- Optional stretch: Harvard's free **CS50 Scratch** course at [cs50.harvard.edu/scratch](https://cs50.harvard.edu/scratch)
 - **Milestone:** a game with a score and a win condition, that he designed
 
 ### Week 2 — micro:bit simulator (does he like sensors?)
@@ -79,7 +79,7 @@ Four phases. Move on when the milestone is done, not when the calendar says so. 
 **Goal:** The sense → decide → act loop becomes intuitive. He owns a robot that reacts to the physical world.
 
 **Software**
-- Continue Scratch; add **Code.org** CS Fundamentals, then CS Discoveries (free, `code.org`)
+- Continue Scratch; add **Code.org** CS Fundamentals, then CS Discoveries (free, [code.org](https://code.org))
 - Move from Scratch to MakeCode blocks on real hardware
 
 **Hardware — the first purchase (~$50–60)**
@@ -106,8 +106,8 @@ Four phases. Move on when the milestone is done, not when the calendar says so. 
 
 **Software — the big transition**
 - MakeCode blocks → **MicroPython on the same micro:bit.** Same board, same projects, new language. This is the least painful blocks-to-text jump available
-- **"Invent Your Own Computer Games with Python"** by Al Sweigart — free online at `inventwithpython.com`, and explicitly written to be understood by kids aged 10–12. This is the single best free Python book for his age
-- Later: **"Automate the Boring Stuff with Python"**, also free at `automatetheboringstuff.com`
+- **"Invent Your Own Computer Games with Python"** by Al Sweigart — free online at [inventwithpython.com](https://inventwithpython.com), and explicitly written to be understood by kids aged 10–12. This is the single best free Python book for his age
+- Later: **"Automate the Boring Stuff with Python"**, also free at [automatetheboringstuff.com](https://automatetheboringstuff.com)
 
 **Team** — see §4. This is the highest-value thing in the entire plan.
 
@@ -129,7 +129,7 @@ Four phases. Move on when the milestone is done, not when the calendar says so. 
 - **Software:** Python properly — functions, files, libraries. Introduce **Git** and version control. Real engineers version their work; starting at 11 is a superpower
 - **Electronics:** breadboard → **soldering** (see §7 for safety). His first solder project should have 5–15 joints and visibly *do something* — light up, buzz, or move
 - **Free projects:** **projects.raspberrypi.org** — 250+ free step-by-step projects from the Raspberry Pi Foundation
-- **AI:** **Teachable Machine** (`teachablemachine.withgoogle.com`) — train an image/sound/pose model with no code, in an afternoon. Then **Machine Learning for Kids** (`machinelearningforkids.co.uk`) to wire a trained model into a Scratch or Python project
+- **AI:** **Teachable Machine** ([teachablemachine.withgoogle.com](https://teachablemachine.withgoogle.com)) — train an image/sound/pose model with no code, in an afternoon. Then **Machine Learning for Kids** ([machinelearningforkids.co.uk](https://machinelearningforkids.co.uk)) to wire a trained model into a Scratch or Python project
 - **Math:** Algebra 1 track
 
 **Milestone project:** a robot that uses a camera or a model he trained himself.
@@ -192,19 +192,19 @@ This is genuinely important and most parents don't know it yet:
 | **VEX IQ** (VIQRC) | Elementary = below 6th grade | Kit ~$400+, plus registration & events | **2026-27 game: "Level Up."** Most future-stable. He's elementary division; elementary students *may* play up to middle school |
 | **FIRST LEGO League Challenge** | Ages 9–16 (~grades 4–8) | ~$285 registration + challenge set + event fees | Final season ever. Season underway now |
 | **4-H Robotics** | Varies | ~$20–100/yr | **Cheapest real club.** Strong in rural and farming communities. Contact your county extension office |
-| **SeaPerch** | Middle school+ | Low | Underwater ROV. Superb hands-on build, very different flavor |
-| **Robofest** | Elementary+ | ~$100 | Autonomous robots, platform-agnostic |
-| **RoboRAVE / National Robotics Challenge** | Varies | Low–moderate | No required kit — build from anything |
-| **Wonder League** | Elementary & middle | Low | Good entry point for younger kids |
+| [**SeaPerch**](https://seaperch.org/) | Middle school+ | Low | Underwater ROV. Superb hands-on build, very different flavor |
+| [**Robofest**](https://www.robofest.net/) | Elementary+ | ~$100 | Autonomous robots, platform-agnostic |
+| [**RoboRAVE**](https://www.roborave.org/) / [**National Robotics Challenge**](https://www.thenrc.org/) | Varies | Low–moderate | No required kit — build from anything |
+| [**Wonder League**](https://www.makewonder.com/robotics-competition/) | Elementary & middle | Low | Good entry point for younger kids |
 | **Code Club / CoderDojo** | 7–17 | **Free** | Raspberry Pi Foundation. Free coding clubs worldwide |
-| **Coolest Projects** | Any | **Free** | Showcase, not a competition. Great first public demo |
+| [**Coolest Projects**](https://coolestprojects.com) | Any | **Free** | Showcase, not a competition. Great first public demo |
 
 ### How to find something local
 1. **Call your county 4-H extension office.** Cheapest path to a real club, and they'll know what else exists locally
 2. Search **firstinspires.org** and **robotevents.com** for teams near you
 3. Ask his school — many have teams that don't advertise
 4. Check the **public library** — many run makerspaces and clubs
-5. **NASA's Robotics Alliance Project** (`robotics.nasa.gov/robotic-competitions`) maintains a competition directory
+5. **NASA's Robotics Alliance Project** ([robotics.nasa.gov/robotic-competitions](https://robotics.nasa.gov/robotic-competitions/)) maintains a competition directory
 
 ### If there's no team near you
 **Start one.** Both FLL and VEX support new teams — you need 2–10 kids and one adult coach. **You do not need to know robotics to coach.** You need to book a room, keep a schedule, and ask good questions. The kids figure out the robot. Recruit two other families and you have a team.
@@ -331,61 +331,61 @@ Everything here is genuinely free.
 ### Programming
 | Resource | URL | Notes |
 |---|---|---|
-| Scratch | `scratch.mit.edu` | MIT. The universal starting point |
-| CS50 Scratch | `cs50.harvard.edu/scratch` | Harvard, free, gentlest real CS intro |
-| Code.org | `code.org` | CS Fundamentals + CS Discoveries, full free curriculum |
-| Khan Academy | `khanacademy.org` | Math *and* intro programming |
-| Invent With Python | `inventwithpython.com` | Al Sweigart's books, free under Creative Commons. *Invent Your Own Computer Games* is written for ages 10–12 |
-| Automate the Boring Stuff | `automatetheboringstuff.com` | Free online, the practical follow-on |
-| CS Unplugged | `csunplugged.org` | Computer science with no computer — cards, string, running around |
+| Scratch | [scratch.mit.edu](https://scratch.mit.edu) | MIT. The universal starting point |
+| CS50 Scratch | [cs50.harvard.edu/scratch](https://cs50.harvard.edu/scratch) | Harvard, free, gentlest real CS intro |
+| Code.org | [code.org](https://code.org) | CS Fundamentals + CS Discoveries, full free curriculum |
+| Khan Academy | [khanacademy.org](https://www.khanacademy.org) | Math *and* intro programming |
+| Invent With Python | [inventwithpython.com](https://inventwithpython.com) | Al Sweigart's books, free under Creative Commons. *Invent Your Own Computer Games* is written for ages 10–12 |
+| Automate the Boring Stuff | [automatetheboringstuff.com](https://automatetheboringstuff.com) | Free online, the practical follow-on |
+| CS Unplugged | [csunplugged.org](https://www.csunplugged.org/en/) | Computer science with no computer — cards, string, running around |
 
 ### Robotics & electronics
 | Resource | URL | Notes |
 |---|---|---|
-| micro:bit MakeCode | `makecode.microbit.org` | **Built-in simulator — no hardware needed** |
-| micro:bit Foundation | `microbit.org` | Free lessons and classroom activities |
-| SparkFun Learn | `learn.sparkfun.com` | Excellent free tutorials, 23+ on micro:bit alone |
-| Adafruit Learning System | `learn.adafruit.com` | Deep, well-written electronics guides |
-| Raspberry Pi Projects | `projects.raspberrypi.org` | 250+ free step-by-step projects |
-| Tinkercad | `tinkercad.com` | Free 3D design + a full circuit simulator + Codeblocks |
+| micro:bit MakeCode | [makecode.microbit.org](https://makecode.microbit.org) | **Built-in simulator — no hardware needed** |
+| micro:bit Foundation | [microbit.org](https://microbit.org) | Free lessons and classroom activities |
+| SparkFun Learn | [learn.sparkfun.com](https://learn.sparkfun.com) | Excellent free tutorials, 23+ on micro:bit alone |
+| Adafruit Learning System | [learn.adafruit.com](https://learn.adafruit.com) | Deep, well-written electronics guides |
+| Raspberry Pi Projects | [projects.raspberrypi.org](https://projects.raspberrypi.org/en/projects) | 250+ free step-by-step projects |
+| Tinkercad | [tinkercad.com](https://www.tinkercad.com) | Free 3D design + a full circuit simulator + Codeblocks |
 
 ### Simulators (robotics with zero hardware)
 | Resource | URL | Notes |
 |---|---|---|
-| VEXcode VR | `vexrobotics.com/vexcode/vr` | Browser-based virtual robot. Blocks → Python |
-| Webots | `cyberbotics.com` | Free, open-source, used in industry and research |
-| robotbenchmark | `robotbenchmark.net` | Webots in the browser, Python, free challenges |
+| VEXcode VR | [vexrobotics.com/vexcode/vr](https://www.vexrobotics.com/vexcode/vr) | Browser-based virtual robot. Blocks → Python |
+| Webots | [cyberbotics.com](https://cyberbotics.com) | Free, open-source, used in industry and research |
+| robotbenchmark | [robotbenchmark.net](https://robotbenchmark.net) | Webots in the browser, Python, free challenges |
 | Gears / GearsBot | search "GearsBot simulator" | Blocks → auto-converts to Python |
 
 ### AI
 | Resource | URL | Notes |
 |---|---|---|
-| Teachable Machine | `teachablemachine.withgoogle.com` | Google. Train a model in an afternoon, no code |
-| Machine Learning for Kids | `machinelearningforkids.co.uk` | Wire trained models into Scratch and Python |
+| Teachable Machine | [teachablemachine.withgoogle.com](https://teachablemachine.withgoogle.com) | Google. Train a model in an afternoon, no code |
+| Machine Learning for Kids | [machinelearningforkids.co.uk](https://machinelearningforkids.co.uk) | Wire trained models into Scratch and Python |
 
 ### CAD
 | Resource | URL | Notes |
 |---|---|---|
-| Tinkercad | `tinkercad.com` | Start here |
-| Onshape Education | `onshape.com/en/education` | Free education plan. Professional parametric CAD. 13+, or adult-authorized |
+| Tinkercad | [tinkercad.com](https://www.tinkercad.com) | Start here |
+| Onshape Education | [onshape.com/en/education](https://www.onshape.com/en/education/) | Free education plan. Professional parametric CAD. 13+, or adult-authorized |
 
 ### Clubs & competitions
 | Resource | URL | Notes |
 |---|---|---|
-| Code Club | `codeclub.org` | Free clubs worldwide |
+| Code Club | [codeclub.org](https://codeclub.org) | Free clubs worldwide |
 | CoderDojo | Raspberry Pi Foundation | Free, ages 7–17 |
-| 4-H Robotics | `4-h.org/programs/robotics` | Contact your county extension office |
-| FIRST | `firstinspires.org` | FLL and beyond |
-| RECF / VEX | `recf.org`, `robotevents.com` | Find local VEX events and teams |
-| NASA Robotics Alliance | `robotics.nasa.gov/robotic-competitions` | Competition directory |
+| 4-H Robotics | [4-h.org/programs/robotics](https://4-h.org/programs/robotics/) | Contact your county extension office |
+| FIRST | [firstinspires.org](https://www.firstinspires.org) | FLL and beyond |
+| RECF / VEX | [recf.org](https://recf.org), [robotevents.com](https://www.robotevents.com) | Find local VEX events and teams |
+| NASA Robotics Alliance | [robotics.nasa.gov/robotic-competitions](https://robotics.nasa.gov/robotic-competitions/) | Competition directory |
 
 ---
 
 ## 11. What to do this week
 
-1. **Tonight:** open `scratch.mit.edu` together and make something for 30 minutes. Nothing else.
+1. **Tonight:** open [scratch.mit.edu](https://scratch.mit.edu) together and make something for 30 minutes. Nothing else.
 2. **This week:** start the 30-day kickstart (§1). Put the four weeks on the calendar.
-3. **This week, in parallel — this one is time-sensitive:** call your county 4-H extension office, and search `robotevents.com` and `firstinspires.org` for teams near you. **The 2026-27 season is already underway and it's the last FLL season ever.** Teams form in August and September.
+3. **This week, in parallel — this one is time-sensitive:** call your county 4-H extension office, and search [robotevents.com](https://www.robotevents.com) and [firstinspires.org](https://www.firstinspires.org) for teams near you. **The 2026-27 season is already underway and it's the last FLL season ever.** Teams form in August and September.
 4. **Start the 15-minutes-a-day Khan Academy habit now.** It compounds, and it's the thing that's still paying off in six years.
 5. **Buy nothing** until the 30 days are done.
 
