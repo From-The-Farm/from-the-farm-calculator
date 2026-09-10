@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A gamified robot-building quest for kids: 20 free quests, 5 levels, XP and badges. Every tool is free.">
+<title>Emery's Robot Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap">
+<style>
+:root{
+  --bg:#E8EFF3; --panel:#FFFFFF; --panel-2:#F2F6F8; --edge:#C3D2DB;
+  --navy:#10243A; --navy-soft:#4A6076; --faint:#7D93A5;
+  --bolt:#0090A8; --bolt-ink:#FFFFFF;
+  --zap:#E08900; --zap-soft:#FFEFD0;
+  --go:#1E8A4C; --go-soft:#DCF2E4;
+  --pop:#D94550;
+  --lock:#94A8B6;
+  --shadow:0 2px 0 var(--edge);
+  --shadow-lift:0 4px 0 var(--edge);
+  --f-hud:"Bungee",Impact,"Arial Black",sans-serif;
+  --f-body:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1722; --panel:#17273A; --panel-2:#1E3145; --edge:#2E4560;
+    --navy:#E6F0F7; --navy-soft:#A8BECE; --faint:#7F97AA;
+    --bolt:#3AD0E6; --bolt-ink:#06212B;
+    --zap:#FFC24D; --zap-soft:#3A2C10;
+    --go:#54D486; --go-soft:#12321F;
+    --pop:#FF7A83;
+    --lock:#5C7386;
+    --shadow:0 2px 0 #0A121B; --shadow-lift:0 4px 0 #0A121B;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1722; --panel:#17273A; --panel-2:#1E3145; --edge:#2E4560;
+  --navy:#E6F0F7; --navy-soft:#A8BECE; --faint:#7F97AA;
+  --bolt:#3AD0E6; --bolt-ink:#06212B;
+  --zap:#FFC24D; --zap-soft:#3A2C10;
+  --go:#54D486; --go-soft:#12321F;
+  --pop:#FF7A83;
+  --lock:#5C7386;
+  --shadow:0 2px 0 #0A121B; --shadow-lift:0 4px 0 #0A121B;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--navy);font-family:var(--f-body);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 80px}
+
+/* ============ HUD ============ */
+.hud{
+  position:sticky;top:0;z-index:40;background:var(--panel);
+  border-bottom:3px solid var(--navy);margin:0 -16px 22px;padding:10px 16px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.hud-badge{
+  font-family:var(--f-hud);font-size:13px;background:var(--navy);color:var(--panel);
+  padding:7px 12px;border-radius:6px;white-space:nowrap;letter-spacing:.02em;
+}
+.hud-mid{flex:1;min-width:140px;max-width:420px}
+.hud-lvl{font-family:var(--f-hud);font-size:13px;color:var(--navy);letter-spacing:.02em;line-height:1.2}
+.xpbar{height:14px;background:var(--panel-2);border:2px solid var(--navy);border-radius:99px;overflow:hidden;margin-top:4px}
+.xpfill{height:100%;width:0;background:var(--zap);border-radius:99px;transition:width .45s cubic-bezier(.2,.9,.3,1.3)}
+.hud-xp{font-family:var(--f-hud);font-size:15px;color:var(--zap);white-space:nowrap;font-variant-numeric:tabular-nums}
+.hud-badges{font-family:var(--f-hud);font-size:13px;color:var(--bolt);white-space:nowrap}
+
+/* ============ title ============ */
+.top{text-align:center;padding:26px 0 8px}
+h1{font-family:var(--f-hud);font-size:clamp(1.9rem,7vw,3.3rem);line-height:1.04;margin:0 0 10px;letter-spacing:.01em}
+h1 .rob{color:var(--bolt)}
+.sub{font-size:1.05rem;font-weight:700;color:var(--navy-soft);margin:0 0 14px}
+.freeflag{
+  display:inline-block;font-family:var(--f-hud);font-size:12px;color:var(--go);
+  background:var(--go-soft);border:2px solid var(--go);border-radius:99px;padding:6px 14px;
+}
+
+/* ============ next quest ============ */
+.next{
+  background:var(--bolt);color:var(--bolt-ink);border:3px solid var(--navy);border-radius:16px;
+  padding:20px;margin:22px 0 30px;box-shadow:var(--shadow-lift);
+  display:flex;gap:18px;align-items:center;flex-wrap:wrap;
+}
+.next-tag{font-family:var(--f-hud);font-size:12px;opacity:.85;display:block;margin-bottom:4px;letter-spacing:.05em}
+.next-icon{font-size:44px;line-height:1;flex:0 0 auto}
+.next-main{flex:1;min-width:190px}
+.next h2{font-family:var(--f-hud);font-size:1.4rem;margin:0 0 4px;line-height:1.15}
+.next p{margin:0;font-weight:700;font-size:1rem;opacity:.9}
+.next-go{
+  font-family:var(--f-hud);font-size:15px;background:var(--navy);color:var(--panel);
+  border:none;border-radius:10px;padding:14px 20px;text-decoration:none;display:inline-block;
+  white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.35);
+}
+.next-go:hover{transform:translateY(-2px)}
+.next.alldone{background:var(--zap);color:#2A1A00}
+
+/* ============ levels ============ */
+.level{margin-bottom:34px;border:3px solid var(--navy);border-radius:16px;background:var(--panel);box-shadow:var(--shadow-lift);overflow:hidden}
+.level-head{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--panel-2);border-bottom:3px solid var(--navy);flex-wrap:wrap}
+.level-n{font-family:var(--f-hud);font-size:12px;background:var(--navy);color:var(--panel);padding:6px 10px;border-radius:6px;white-space:nowrap}
+.level-head h2{font-family:var(--f-hud);font-size:1.15rem;margin:0;flex:1;min-width:130px;line-height:1.2}
+.level-tool{font-size:.85rem;font-weight:800;color:var(--navy-soft);white-space:nowrap}
+.level-lock{font-family:var(--f-hud);font-size:11px;color:var(--panel);background:var(--lock);padding:6px 10px;border-radius:6px;white-space:nowrap}
+.level-body{padding:16px;display:grid;gap:12px}
+.level.locked .level-body{opacity:.45;filter:grayscale(.7)}
+.level.locked .q-done,.level.locked .q-go{pointer-events:none}
+
+/* ============ quest card ============ */
+.quest{
+  display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;
+  background:var(--panel-2);border:2px solid var(--edge);border-radius:12px;padding:12px 14px;
+}
+.quest.done{background:var(--go-soft);border-color:var(--go)}
+.q-icon{
+  font-size:28px;width:52px;height:52px;border-radius:12px;background:var(--panel);
+  border:2px solid var(--edge);display:flex;align-items:center;justify-content:center;
+}
+.quest.done .q-icon{background:var(--go);border-color:var(--go)}
+.q-body{min-width:0}
+.q-body h3{font-family:var(--f-hud);font-size:1rem;margin:0 0 2px;line-height:1.2}
+.q-body p{margin:0 0 6px;font-size:.95rem;font-weight:600;color:var(--navy-soft)}
+.quest.done .q-body h3{text-decoration:line-through;text-decoration-thickness:3px;text-decoration-color:var(--go)}
+.q-go{
+  font-weight:800;font-size:.9rem;color:var(--bolt);text-decoration:none;
+  border-bottom:2px solid var(--bolt);padding-bottom:1px;
+}
+.q-go:hover{color:var(--navy);border-color:var(--navy)}
+.q-side{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.q-xp{font-family:var(--f-hud);font-size:12px;color:var(--zap);background:var(--zap-soft);padding:4px 8px;border-radius:6px;white-space:nowrap}
+.q-done{
+  font-family:var(--f-hud);font-size:13px;cursor:pointer;
+  background:var(--navy);color:var(--panel);border:none;border-radius:9px;
+  padding:11px 16px;box-shadow:0 3px 0 rgba(0,0,0,.3);white-space:nowrap;
+}
+.q-done:hover{transform:translateY(-2px)}
+.q-done:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.3)}
+.quest.done .q-done{background:var(--go);box-shadow:0 3px 0 rgba(0,0,0,.25)}
+button:focus-visible,a:focus-visible{outline:4px solid var(--zap);outline-offset:3px;border-radius:8px}
+
+/* ============ badges ============ */
+.badges{border:3px solid var(--navy);border-radius:16px;background:var(--panel);box-shadow:var(--shadow-lift);overflow:hidden;margin-bottom:30px}
+.badges h2{font-family:var(--f-hud);font-size:1.15rem;margin:0;padding:14px 18px;background:var(--panel-2);border-bottom:3px solid var(--navy)}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:12px;padding:16px}
+.badge{text-align:center;padding:12px 8px;border:2px dashed var(--edge);border-radius:12px;background:var(--panel-2)}
+.badge .b-ico{font-size:30px;line-height:1;filter:grayscale(1);opacity:.35}
+.badge .b-name{font-family:var(--f-hud);font-size:10.5px;margin-top:7px;color:var(--faint);line-height:1.3}
+.badge.earned{border:2px solid var(--zap);background:var(--zap-soft)}
+.badge.earned .b-ico{filter:none;opacity:1}
+.badge.earned .b-name{color:var(--navy)}
+
+/* ============ clubs ============ */
+.clubs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px}
+.club{background:var(--panel);border:3px solid var(--navy);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.club .c-ico{font-size:26px}
+.club h3{font-family:var(--f-hud);font-size:.95rem;margin:6px 0 4px;line-height:1.2}
+.club p{margin:0 0 8px;font-size:.9rem;font-weight:600;color:var(--navy-soft)}
+h2.section{font-family:var(--f-hud);font-size:1.2rem;margin:0 0 12px}
+
+/* ============ toast ============ */
+#toast{
+  position:fixed;left:50%;top:74px;transform:translate(-50%,-24px);z-index:60;
+  background:var(--zap);color:#2A1A00;font-family:var(--f-hud);font-size:16px;
+  padding:14px 22px;border:3px solid var(--navy);border-radius:12px;
+  box-shadow:0 5px 0 rgba(0,0,0,.28);opacity:0;pointer-events:none;
+  transition:opacity .25s,transform .25s;text-align:center;max-width:92vw;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:55}
+
+footer{text-align:center;font-size:.85rem;font-weight:600;color:var(--faint);padding-top:10px}
+footer button{
+  font-family:var(--f-body);font-weight:800;font-size:.82rem;color:var(--faint);
+  background:none;border:2px solid var(--edge);border-radius:8px;padding:6px 12px;cursor:pointer;margin-top:8px;
+}
+footer button:hover{color:var(--pop);border-color:var(--pop)}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .quest{grid-template-columns:46px 1fr;grid-template-areas:"i b" "s s"}
+  .q-icon{grid-area:i;width:44px;height:44px;font-size:24px}
+  .q-body{grid-area:b}
+  .q-side{grid-area:s;flex-direction:row;align-items:center;justify-content:space-between;width:100%}
+  .q-done{flex:1;text-align:center}
+  .next{flex-direction:column;align-items:flex-start;text-align:left}
+  .next-go{width:100%;text-align:center}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .q-done:hover,.next-go:hover{transform:none}
+}
+</style>
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<div class="hud">
+  <span class="hud-badge" id="hudLvl">LVL 1</span>
+  <div class="hud-mid">
+    <div class="hud-lvl" id="hudName">ROOKIE</div>
+    <div class="xpbar"><div class="xpfill" id="xpfill"></div></div>
+  </div>
+  <span class="hud-xp" id="hudXp">0 XP</span>
+  <span class="hud-badges" id="hudBadges">0/8 ★</span>
+</div>
+
+<div class="wrap">
+
+<div class="top">
+  <h1>EMERY'S <span class="rob">ROBOT</span> QUEST</h1>
+  <p class="sub">20 quests. 5 levels. Build real robots.</p>
+  <span class="freeflag">★ EVERYTHING HERE IS FREE ★</span>
+</div>
+
+<div class="next" id="nextCard">
+  <div class="next-icon" id="nextIcon">🐱</div>
+  <div class="next-main">
+    <span class="next-tag">YOUR NEXT QUEST</span>
+    <h2 id="nextTitle">Make a cat dance</h2>
+    <p id="nextDesc">Drag blocks to make the cat move and spin.</p>
+  </div>
+  <a class="next-go" id="nextGo" href="https://scratch.mit.edu" target="_blank" rel="noopener">START →</a>
+</div>
+
+<!-- ================= LEVEL 1 ================= -->
+<section class="level" id="lv1" data-level="1" data-need="0">
+  <div class="level-head">
+    <span class="level-n">LVL 1</span>
+    <h2>ROOKIE</h2>
+    <span class="level-tool">Scratch · free</span>
+  </div>
+  <div class="level-body">
+    <article class="quest" data-q="q1" data-xp="10" data-icon="🐱" data-url="https://scratch.mit.edu">
+      <div class="q-icon">🐱</div>
+      <div class="q-body">
+        <h3>Make a cat dance</h3>
+        <p>Drag blocks to make the cat move and spin.</p>
+        <a class="q-go" href="https://scratch.mit.edu" target="_blank" rel="noopener">Open Scratch →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+10 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q2" data-xp="15" data-icon="🎮" data-url="https://scratch.mit.edu">
+      <div class="q-icon">🎮</div>
+      <div class="q-body">
+        <h3>Make a game</h3>
+        <p>It needs points and a way to win.</p>
+        <a class="q-go" href="https://scratch.mit.edu" target="_blank" rel="noopener">Open Scratch →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+15 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q3" data-xp="10" data-icon="🖱️" data-url="https://scratch.mit.edu">
+      <div class="q-icon">🖱️</div>
+      <div class="q-body">
+        <h3>Chase the mouse</h3>
+        <p>Make a sprite follow your mouse around.</p>
+        <a class="q-go" href="https://scratch.mit.edu" target="_blank" rel="noopener">Open Scratch →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+10 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q4" data-xp="10" data-icon="👋" data-url="">
+      <div class="q-icon">👋</div>
+      <div class="q-body">
+        <h3>Show someone</h3>
+        <p>Show your game to a grown-up. Explain how it works.</p>
+      </div>
+      <div class="q-side"><span class="q-xp">+10 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= LEVEL 2 ================= -->
+<section class="level" id="lv2" data-level="2" data-need="45">
+  <div class="level-head">
+    <span class="level-n">LVL 2</span>
+    <h2>CODER</h2>
+    <span class="level-tool">micro:bit · free</span>
+  </div>
+  <div class="level-body">
+    <article class="quest" data-q="q5" data-xp="15" data-icon="🤖" data-url="https://makecode.microbit.org">
+      <div class="q-icon">🤖</div>
+      <div class="q-body">
+        <h3>Make a robot face</h3>
+        <p>Light up dots to draw eyes and a mouth.</p>
+        <a class="q-go" href="https://makecode.microbit.org" target="_blank" rel="noopener">Open MakeCode →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+15 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q6" data-xp="15" data-icon="⏱️" data-url="https://makecode.microbit.org">
+      <div class="q-icon">⏱️</div>
+      <div class="q-body">
+        <h3>Reaction timer</h3>
+        <p>How fast can you press the button? Time it.</p>
+        <a class="q-go" href="https://makecode.microbit.org" target="_blank" rel="noopener">Open MakeCode →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+15 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q7" data-xp="15" data-icon="🫨" data-url="https://makecode.microbit.org">
+      <div class="q-icon">🫨</div>
+      <div class="q-body">
+        <h3>Shake it</h3>
+        <p>Make something happen when you shake it.</p>
+        <a class="q-go" href="https://makecode.microbit.org" target="_blank" rel="noopener">Open MakeCode →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+15 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q8" data-xp="15" data-icon="👟" data-url="https://makecode.microbit.org">
+      <div class="q-icon">👟</div>
+      <div class="q-body">
+        <h3>Step counter</h3>
+        <p>Count steps like a fitness watch does.</p>
+        <a class="q-go" href="https://makecode.microbit.org" target="_blank" rel="noopener">Open MakeCode →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+15 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= LEVEL 3 ================= -->
+<section class="level" id="lv3" data-level="3" data-need="105">
+  <div class="level-head">
+    <span class="level-n">LVL 3</span>
+    <h2>ROBOT DRIVER</h2>
+    <span class="level-tool">VEXcode VR · free</span>
+  </div>
+  <div class="level-body">
+    <article class="quest" data-q="q9" data-xp="15" data-icon="🕹️" data-url="https://www.vexrobotics.com/vexcode/vr">
+      <div class="q-icon">🕹️</div>
+      <div class="q-body">
+        <h3>Drive the robot</h3>
+        <p>A real robot on your screen. Drive it around.</p>
+        <a class="q-go" href="https://www.vexrobotics.com/vexcode/vr" target="_blank" rel="noopener">Open VEXcode VR →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+15 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q10" data-xp="20" data-icon="⬜" data-url="https://www.vexrobotics.com/vexcode/vr">
+      <div class="q-icon">⬜</div>
+      <div class="q-body">
+        <h3>Drive a square</h3>
+        <p>Code it to drive a perfect square. Harder than it looks!</p>
+        <a class="q-go" href="https://www.vexrobotics.com/vexcode/vr" target="_blank" rel="noopener">Open VEXcode VR →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+20 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q11" data-xp="25" data-icon="🌀" data-url="https://www.vexrobotics.com/vexcode/vr">
+      <div class="q-icon">🌀</div>
+      <div class="q-body">
+        <h3>Beat the maze</h3>
+        <p>The robot solves it alone. You can't touch it.</p>
+        <a class="q-go" href="https://www.vexrobotics.com/vexcode/vr" target="_blank" rel="noopener">Open VEXcode VR →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+25 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q12" data-xp="20" data-icon="🛑" data-url="https://www.vexrobotics.com/vexcode/vr">
+      <div class="q-icon">🛑</div>
+      <div class="q-body">
+        <h3>Stop at the wall</h3>
+        <p>Use a sensor so it stops before it crashes.</p>
+        <a class="q-go" href="https://www.vexrobotics.com/vexcode/vr" target="_blank" rel="noopener">Open VEXcode VR →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+20 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= LEVEL 4 ================= -->
+<section class="level" id="lv4" data-level="4" data-need="185">
+  <div class="level-head">
+    <span class="level-n">LVL 4</span>
+    <h2>MAKER</h2>
+    <span class="level-tool">Tinkercad · free</span>
+  </div>
+  <div class="level-body">
+    <article class="quest" data-q="q13" data-xp="20" data-icon="🗿" data-url="https://www.tinkercad.com">
+      <div class="q-icon">🗿</div>
+      <div class="q-body">
+        <h3>Build a robot head</h3>
+        <p>Design it in 3D. Spin it around and look at it.</p>
+        <a class="q-go" href="https://www.tinkercad.com" target="_blank" rel="noopener">Open Tinkercad →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+20 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q14" data-xp="20" data-icon="💡" data-url="https://www.tinkercad.com">
+      <div class="q-icon">💡</div>
+      <div class="q-body">
+        <h3>Light an LED</h3>
+        <p>Wire up a real circuit. Nothing can catch fire.</p>
+        <a class="q-go" href="https://www.tinkercad.com" target="_blank" rel="noopener">Open Tinkercad →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+20 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q15" data-xp="20" data-icon="🔊" data-url="https://www.tinkercad.com">
+      <div class="q-icon">🔊</div>
+      <div class="q-body">
+        <h3>Make it buzz</h3>
+        <p>Add a buzzer and make an alarm sound.</p>
+        <a class="q-go" href="https://www.tinkercad.com" target="_blank" rel="noopener">Open Tinkercad →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+20 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q16" data-xp="25" data-icon="🔩" data-url="https://www.tinkercad.com">
+      <div class="q-icon">🔩</div>
+      <div class="q-body">
+        <h3>Design a robot part</h3>
+        <p>A wheel, an arm, a claw. Your choice.</p>
+        <a class="q-go" href="https://www.tinkercad.com" target="_blank" rel="noopener">Open Tinkercad →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+25 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= LEVEL 5 ================= -->
+<section class="level" id="lv5" data-level="5" data-need="270">
+  <div class="level-head">
+    <span class="level-n">LVL 5</span>
+    <h2>INVENTOR</h2>
+    <span class="level-tool">AI + your ideas · free</span>
+  </div>
+  <div class="level-body">
+    <article class="quest" data-q="q17" data-xp="25" data-icon="🧠" data-url="https://teachablemachine.withgoogle.com">
+      <div class="q-icon">🧠</div>
+      <div class="q-body">
+        <h3>Train an AI</h3>
+        <p>Teach a computer to tell two things apart.</p>
+        <a class="q-go" href="https://teachablemachine.withgoogle.com" target="_blank" rel="noopener">Open Teachable Machine →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+25 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q18" data-xp="30" data-icon="✂️" data-url="https://teachablemachine.withgoogle.com">
+      <div class="q-icon">✂️</div>
+      <div class="q-body">
+        <h3>Rock paper scissors AI</h3>
+        <p>Train it on your hands. Then play against it.</p>
+        <a class="q-go" href="https://teachablemachine.withgoogle.com" target="_blank" rel="noopener">Open Teachable Machine →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+30 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q19" data-xp="40" data-icon="🚀" data-url="https://projects.raspberrypi.org/en/projects">
+      <div class="q-icon">🚀</div>
+      <div class="q-body">
+        <h3>Build YOUR idea</h3>
+        <p>Anything you want. Nobody tells you what.</p>
+        <a class="q-go" href="https://projects.raspberrypi.org/en/projects" target="_blank" rel="noopener">Get ideas →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+40 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+    <article class="quest" data-q="q20" data-xp="30" data-icon="🌍" data-url="https://coolestprojects.com">
+      <div class="q-icon">🌍</div>
+      <div class="q-body">
+        <h3>Show the world</h3>
+        <p>Put your project online. It's free to enter.</p>
+        <a class="q-go" href="https://coolestprojects.com" target="_blank" rel="noopener">Coolest Projects →</a>
+      </div>
+      <div class="q-side"><span class="q-xp">+30 XP</span><button class="q-done" type="button">DONE!</button></div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= BADGES ================= -->
+<div class="badges">
+  <h2>★ YOUR BADGES</h2>
+  <div class="badge-grid" id="badgeGrid">
+    <div class="badge" data-b="first"><div class="b-ico">🌱</div><div class="b-name">FIRST STEP</div></div>
+    <div class="badge" data-b="lv1"><div class="b-ico">🐱</div><div class="b-name">SCRATCH PRO</div></div>
+    <div class="badge" data-b="lv2"><div class="b-ico">📟</div><div class="b-name">SENSOR SQUAD</div></div>
+    <div class="badge" data-b="half"><div class="b-ico">⚡</div><div class="b-name">HALFWAY</div></div>
+    <div class="badge" data-b="lv3"><div class="b-ico">🏁</div><div class="b-name">ROBOT DRIVER</div></div>
+    <div class="badge" data-b="lv4"><div class="b-ico">🛠️</div><div class="b-name">MAKER</div></div>
+    <div class="badge" data-b="lv5"><div class="b-ico">👑</div><div class="b-name">INVENTOR</div></div>
+    <div class="badge" data-b="all"><div class="b-ico">🏆</div><div class="b-name">ALL 20 DONE</div></div>
+  </div>
+</div>
+
+<!-- ================= CLUBS ================= -->
+<h2 class="section">★ FREE ROBOT CLUBS</h2>
+<div class="clubs">
+  <div class="club">
+    <div class="c-ico">👾</div>
+    <h3>Code Club</h3>
+    <p>Free coding clubs. Find one near you.</p>
+    <a class="q-go" href="https://codeclub.org" target="_blank" rel="noopener">Find a club →</a>
+  </div>
+  <div class="club">
+    <div class="c-ico">🥋</div>
+    <h3>CoderDojo</h3>
+    <p>Free clubs for kids 7 to 17.</p>
+    <a class="q-go" href="https://coderdojo.com/" target="_blank" rel="noopener">Find a dojo →</a>
+  </div>
+  <div class="club">
+    <div class="c-ico">🍓</div>
+    <h3>250+ free projects</h3>
+    <p>Games, robots and more. Step by step.</p>
+    <a class="q-go" href="https://projects.raspberrypi.org/en/projects" target="_blank" rel="noopener">Browse →</a>
+  </div>
+</div>
+
+<footer>
+  <p>Every single thing on this page is free. No kit needed to start.</p>
+  <button type="button" id="reset">Start over</button>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY = "emery.robotquest.v1";
+  var LEVELS = [
+    {n:1, name:"ROOKIE",       need:0},
+    {n:2, name:"CODER",        need:45},
+    {n:3, name:"ROBOT DRIVER", need:105},
+    {n:4, name:"MAKER",        need:185},
+    {n:5, name:"INVENTOR",     need:270}
+  ];
+  var MAX = 395;
+  var quests = [].slice.call(document.querySelectorAll(".quest"));
+  var levels = [].slice.call(document.querySelectorAll(".level"));
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+  function save(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
+  var state = load();
+
+  function xpOf(){
+    return quests.reduce(function(t,q){
+      return t + (state[q.dataset.q] ? parseInt(q.dataset.xp,10) : 0);
+    },0);
+  }
+  function doneCount(){ return quests.filter(function(q){ return state[q.dataset.q]; }).length; }
+  function levelDone(n){
+    var sec = document.querySelector('.level[data-level="'+n+'"]');
+    return [].slice.call(sec.querySelectorAll(".quest")).every(function(q){ return state[q.dataset.q]; });
+  }
+  function curLevel(xp){
+    var L = LEVELS[0];
+    LEVELS.forEach(function(l){ if(xp >= l.need) L = l; });
+    return L;
+  }
+
+  function earnedBadges(){
+    var d = doneCount();
+    return {
+      first: d >= 1,
+      lv1:   levelDone(1),
+      lv2:   levelDone(2),
+      half:  d >= 10,
+      lv3:   levelDone(3),
+      lv4:   levelDone(4),
+      lv5:   levelDone(5),
+      all:   d >= quests.length
+    };
+  }
+
+  function render(){
+    var xp = xpOf(), L = curLevel(xp), b = earnedBadges(), nb = 0;
+
+    document.getElementById("hudLvl").textContent = "LVL " + L.n;
+    document.getElementById("hudName").textContent = L.name;
+    document.getElementById("hudXp").textContent = xp + " XP";
+    document.getElementById("xpfill").style.width = Math.min(100, xp / MAX * 100) + "%";
+
+    quests.forEach(function(q){
+      var on = !!state[q.dataset.q];
+      q.classList.toggle("done", on);
+      q.querySelector(".q-done").textContent = on ? "DONE ✓" : "DONE!";
+    });
+
+    levels.forEach(function(sec){
+      var need = parseInt(sec.dataset.need,10);
+      var locked = xp < need;
+      sec.classList.toggle("locked", locked);
+      var head = sec.querySelector(".level-head");
+      var tag = head.querySelector(".level-lock");
+      if(locked){
+        if(!tag){ tag = document.createElement("span"); tag.className = "level-lock"; head.appendChild(tag); }
+        tag.textContent = "🔒 " + (need - xp) + " XP TO GO";
+      } else if(tag){ tag.remove(); }
+      sec.querySelectorAll(".q-done").forEach(function(btn){ btn.disabled = locked; });
+    });
+
+    Object.keys(b).forEach(function(k){
+      var el = document.querySelector('.badge[data-b="'+k+'"]');
+      if(!el) return;
+      el.classList.toggle("earned", b[k]);
+      if(b[k]) nb++;
+    });
+    document.getElementById("hudBadges").textContent = nb + "/8 ★";
+
+    // next quest card
+    var next = quests.filter(function(q){ return !state[q.dataset.q]; })[0];
+    var card = document.getElementById("nextCard");
+    if(next){
+      card.classList.remove("alldone");
+      document.getElementById("nextIcon").textContent = next.dataset.icon;
+      document.getElementById("nextTitle").textContent = next.querySelector("h3").textContent;
+      document.getElementById("nextDesc").textContent  = next.querySelector("p").textContent;
+      var go = document.getElementById("nextGo");
+      if(next.dataset.url){ go.href = next.dataset.url; go.style.display = ""; go.textContent = "START →"; }
+      else { go.style.display = "none"; }
+    } else {
+      card.classList.add("alldone");
+      document.getElementById("nextIcon").textContent = "🏆";
+      document.getElementById("nextTitle").textContent = "ALL 20 QUESTS DONE!";
+      document.getElementById("nextDesc").textContent  = "You did the whole thing. Go build something new.";
+      document.getElementById("nextGo").style.display = "none";
+    }
+  }
+
+  // ---- toast ----
+  var toastEl = document.getElementById("toast"), toastT;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ toastEl.classList.remove("show"); }, 2600);
+  }
+
+  // ---- confetti ----
+  var cv = document.getElementById("fx"), ctx = cv.getContext("2d"), bits = [], raf = null;
+  function size(){ cv.width = innerWidth; cv.height = innerHeight; }
+  size(); addEventListener("resize", size);
+  var COLORS = ["#FFB020","#00A6C0","#26A65B","#D94550","#7B61FF"];
+  function burst(x, y, n){
+    if(reduce) return;
+    for(var i=0;i<n;i++){
+      bits.push({
+        x:x, y:y,
+        vx:(Math.random()-.5)*11,
+        vy:Math.random()*-11-3,
+        s:5+Math.random()*6,
+        c:COLORS[(Math.random()*COLORS.length)|0],
+        r:Math.random()*6, vr:(Math.random()-.5)*.4, life:70+Math.random()*40
+      });
+    }
+    if(!raf) raf = requestAnimationFrame(tick);
+  }
+  function tick(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    bits = bits.filter(function(p){ return p.life-- > 0 && p.y < cv.height + 60; });
+    bits.forEach(function(p){
+      p.vy += .38; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); ctx.restore();
+    });
+    if(bits.length){ raf = requestAnimationFrame(tick); }
+    else { ctx.clearRect(0,0,cv.width,cv.height); raf = null; }
+  }
+
+  // ---- clicks ----
+  quests.forEach(function(q){
+    q.querySelector(".q-done").addEventListener("click", function(e){
+      var id = q.dataset.q;
+      var was = !!state[id];
+      var beforeLvl = curLevel(xpOf()).n;
+      var beforeBadges = earnedBadges();
+
+      if(was){ delete state[id]; } else { state[id] = 1; }
+      save(state);
+      render();
+
+      if(!was){
+        var r = e.currentTarget.getBoundingClientRect();
+        burst(r.left + r.width/2, r.top + r.height/2, 34);
+        var afterLvl = curLevel(xpOf()).n;
+        var after = earnedBadges();
+        var newBadge = Object.keys(after).filter(function(k){ return after[k] && !beforeBadges[k]; })[0];
+
+        if(afterLvl > beforeLvl){
+          toast("⬆ LEVEL UP! YOU ARE " + curLevel(xpOf()).name);
+          burst(innerWidth/2, innerHeight/3, 90);
+        } else if(newBadge){
+          var el = document.querySelector('.badge[data-b="'+newBadge+'"] .b-name');
+          toast("★ BADGE EARNED: " + (el ? el.textContent : "NEW BADGE"));
+          burst(innerWidth/2, innerHeight/3, 60);
+        } else {
+          toast("+" + q.dataset.xp + " XP!");
+        }
+      }
+    });
+  });
+
+  document.getElementById("reset").addEventListener("click", function(){
+    if(confirm("Erase all your quests and start over?")){
+      state = {}; save(state); render(); toast("Fresh start!");
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
