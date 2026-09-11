@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="A gamified robot-building quest for kids: 20 free quests, 5 levels, XP and badges. Every tool is free.">
-<title>Emery's Robot Quest</title>
+<title>Emerick's Robot Quest</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap">
@@ -209,7 +209,7 @@ footer button:hover{color:var(--pop);border-color:var(--pop)}
 <div class="wrap">
 
 <div class="top">
-  <h1>EMERY'S <span class="rob">ROBOT</span> QUEST</h1>
+  <h1>EMERICK'S <span class="rob">ROBOT</span> QUEST</h1>
   <p class="sub">20 quests. 5 levels. Build real robots.</p>
   <span class="freeflag">★ EVERYTHING HERE IS FREE ★</span>
 </div>
@@ -505,7 +505,8 @@ footer button:hover{color:var(--pop);border-color:var(--pop)}
 
 <script>
 (function(){
-  var KEY = "emery.robotquest.v1";
+  var KEY = "emerick.robotquest.v1";
+  var OLD_KEY = "emery.robotquest.v1";
   var LEVELS = [
     {n:1, name:"ROOKIE",       need:0},
     {n:2, name:"CODER",        need:45},
@@ -518,7 +519,15 @@ footer button:hover{color:var(--pop);border-color:var(--pop)}
   var levels = [].slice.call(document.querySelectorAll(".level"));
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+  function load(){
+    try{
+      var cur = localStorage.getItem(KEY);
+      if(cur) return JSON.parse(cur) || {};
+      var prev = localStorage.getItem(OLD_KEY);   // progress from before the name fix
+      if(prev){ localStorage.setItem(KEY, prev); return JSON.parse(prev) || {}; }
+    }catch(e){}
+    return {};
+  }
   function save(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
   var state = load();
 
