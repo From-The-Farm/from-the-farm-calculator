@@ -143,9 +143,26 @@ def run():
             m = cache.setdefault(src, simple_mat(src, *spec))
         for i in range(len(o.material_slots)):
             o.material_slots[i].material = m
-    bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', export_yup=True, export_apply=True,
+    bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', export_yup=True, export_apply=True, export_normals=False, export_texcoords=False,
                               export_vertex_color='MATERIAL', export_cameras=False, export_lights=False,
                               export_materials='EXPORT')
     print('exported', OUT, os.path.getsize(OUT) // 1024, 'KB')
 
 run()
+
+# ---- also write a JSON .gltf with the binary buffer embedded (artifact hosts serve .json but not .glb)
+import json, struct, base64
+with open(OUT, 'rb') as f:
+    data = f.read()
+magic, ver, length = struct.unpack_from('<4sII', data, 0)
+off = 12; js = None; binchunk = b''
+while off < length:
+    clen, ctype = struct.unpack_from('<I4s', data, off); off += 8
+    chunk = data[off:off + clen]; off += clen
+    if ctype == b'JSON': js = json.loads(chunk.decode('utf-8'))
+    elif ctype == b'BIN\x00': binchunk = chunk
+js['buffers'][0]['uri'] = 'data:application/octet-stream;base64,' + base64.b64encode(binchunk).decode('ascii')
+jpath = os.path.splitext(OUT)[0] + '.json'
+with open(jpath, 'w') as f:
+    json.dump(js, f, separators=(',', ':'))
+print('json', jpath, os.path.getsize(jpath) // 1024, 'KB')
