@@ -297,3 +297,117 @@ def bark(name='bark', color=lin((84, 74, 64))):
     bump = nt.n('ShaderNodeBump', Strength=0.8, Distance=0.01, Height=n)
     finish(nt, principled(nt, Base_Color=col, Roughness=0.9, Normal=bump.outputs[0]))
     return m
+
+def brick(name='brick_sandy_red'):
+    """Sandy light-red brick; per-brick colour from face attribute 'prand'."""
+    m, nt = new_material(name)
+    P = _pos(nt)
+    prand = _attr(nt, 'prand')
+    ramp = nt.n('ShaderNodeValToRGB', Fac=prand)
+    cr = ramp.color_ramp
+    cols = [(0.0, lin((208, 138, 108))), (0.3, lin((216, 146, 114))), (0.55, lin((222, 154, 122))),
+            (0.78, lin((210, 142, 112))), (0.9, lin((226, 164, 132))), (1.0, lin((198, 130, 102)))]
+    cr.interpolation = 'LINEAR'
+    while len(cr.elements) < len(cols): cr.elements.new(0.5)
+    for el, (p, c) in zip(cr.elements, cols):
+        el.position = p; el.color = (*c, 1.0)
+    sand = _noise(nt, P, 420.0, 3, 0.6)
+    blot = _noise(nt, P, 22.0, 4, 0.6)
+    # sandy speckle: lighter flecks
+    fleck = nt.math('GREATER_THAN', sand, 0.62)
+    col = nt.mix(nt.math('MULTIPLY', fleck, 0.45), ramp.outputs['Color'], lin((232, 196, 166)))
+    col = _tint(nt, col, _centered(nt, blot, 0.08))
+    h = nt.math('MULTIPLY_ADD', sand, 1.0, nt.math('MULTIPLY', blot, 0.4))
+    bump = nt.n('ShaderNodeBump', Strength=0.45, Distance=0.0012, Height=h)
+    finish(nt, principled(nt, Base_Color=col, Roughness=0.9, Normal=bump.outputs[0], Specular_IOR_Level=0.35))
+    return m
+
+def mortar_buff(name='mortar_buff'):
+    m, nt = new_material(name)
+    P = _pos(nt)
+    n = _noise(nt, P, 300.0, 3, 0.6)
+    col = _tint(nt, lin((196, 188, 174)), _centered(nt, n, 0.08))
+    bump = nt.n('ShaderNodeBump', Strength=0.6, Distance=0.001, Height=n)
+    finish(nt, principled(nt, Base_Color=col, Roughness=0.97, Normal=bump.outputs[0]))
+    return m
+
+def red_sand(name='red_sand'):
+    """Southern-Utah red sand / dirt (the existing yard in the owner's photos)."""
+    m, nt = new_material(name)
+    P = _pos(nt)
+    n1 = _noise(nt, P, 0.35, 4, 0.6)
+    n2 = _noise(nt, P, 6.0, 5, 0.6)
+    n3 = _noise(nt, P, 180.0, 3, 0.6)
+    c = nt.mix(n1, lin((190, 104, 70)), lin((206, 122, 84)))
+    c = _tint(nt, c, nt.math('MULTIPLY', _centered(nt, n2, 0.10), _centered(nt, n3, 0.12)))
+    # footprint ripples / clods
+    ripple = nt.n('ShaderNodeTexWave', wave_type='BANDS', bands_direction='X', Vector=P, Scale=9.0, Distortion=6.0, Detail=3.0)
+    h = nt.math('ADD', nt.math('MULTIPLY', ripple.outputs['Factor'], 0.25), nt.math('ADD', n2, nt.math('MULTIPLY', n3, 0.5)))
+    bump = nt.n('ShaderNodeBump', Strength=0.55, Distance=0.004, Height=h)
+    lp = nt.n('ShaderNodeLightPath')
+    b = principled(nt, Base_Color=c, Roughness=0.96, Normal=bump.outputs[0], Specular_IOR_Level=0.3)
+    fac = nt.math('SUBTRACT', 1.0, nt.math('EXPONENT', nt.math('DIVIDE', lp.outputs['Ray Length'], -900.0)))
+    fac = nt.math('MULTIPLY', fac, lp.outputs['Is Camera Ray'])
+    em = nt.n('ShaderNodeEmission', Color=(0.28, 0.30, 0.36), Strength=1.0)
+    mix = nt.n('ShaderNodeMixShader', Fac=fac)
+    nt.link(b.outputs[0], mix.inputs[1]); nt.link(em.outputs[0], mix.inputs[2])
+    finish(nt, mix)
+    return m
+
+def stucco(name='stucco', color=(222, 210, 194)):
+    m, nt = new_material(name)
+    P = _pos(nt)
+    n1 = _noise(nt, P, 90.0, 4, 0.7)
+    n2 = _noise(nt, P, 1.2, 3, 0.5)
+    col = _tint(nt, lin(color), nt.math('MULTIPLY', _centered(nt, n2, 0.03), _centered(nt, n1, 0.03)))
+    bump = nt.n('ShaderNodeBump', Strength=0.35, Distance=0.002, Height=n1)
+    finish(nt, principled(nt, Base_Color=col, Roughness=0.9, Normal=bump.outputs[0]))
+    return m
+
+def dry_weed(name='dry_weed'):
+    m, nt = new_material(name)
+    rnd = nt.n('ShaderNodeObjectInfo').outputs['Random']
+    ramp = nt.n('ShaderNodeValToRGB', Fac=rnd)
+    cr = ramp.color_ramp
+    cols = [(0.0, lin((120, 118, 66))), (0.5, lin((150, 138, 84))), (0.8, lin((96, 110, 52))), (1.0, lin((168, 150, 98)))]
+    while len(cr.elements) < len(cols): cr.elements.new(0.5)
+    for el, (p, c) in zip(cr.elements, cols): el.position = p; el.color = (*c, 1.0)
+    b = principled(nt, Base_Color=ramp.outputs['Color'], Roughness=0.6)
+    tr = nt.n('ShaderNodeBsdfTranslucent', Color=ramp.outputs['Color'])
+    mix = nt.n('ShaderNodeMixShader', Fac=0.25)
+    nt.link(b.outputs[0], mix.inputs[1]); nt.link(tr.outputs[0], mix.inputs[2])
+    finish(nt, mix)
+    return m
+
+def red_rock(name='red_rock'):
+    """Distant sandstone cliffs: horizontal strata + haze by distance."""
+    m, nt = new_material(name)
+    P = _pos(nt)
+    sep = nt.n('ShaderNodeSeparateXYZ', Vector=P)
+    z = sep.outputs['Z']
+    warp = _noise(nt, P, 0.02, 3, 0.5)
+    zz = nt.math('ADD', z, nt.math('MULTIPLY', warp, 14.0))
+    strata = nt.n('ShaderNodeTexWave', wave_type='BANDS', bands_direction='Z',
+                  Vector=nt.n('ShaderNodeCombineXYZ', X=0.0, Y=0.0, Z=zz).outputs[0], Scale=0.045, Distortion=2.0, Detail=4.0)
+    ramp = nt.n('ShaderNodeValToRGB', Fac=strata.outputs['Factor'])
+    cr = ramp.color_ramp
+    cols = [(0.0, lin((164, 78, 52))), (0.35, lin((188, 98, 64))), (0.6, lin((150, 70, 48))), (0.8, lin((204, 124, 86))), (1.0, lin((176, 92, 60)))]
+    while len(cr.elements) < len(cols): cr.elements.new(0.5)
+    for el, (p, c) in zip(cr.elements, cols): el.position = p; el.color = (*c, 1.0)
+    n = _noise(nt, P, 0.3, 5, 0.6)
+    col = _tint(nt, ramp.outputs['Color'], _centered(nt, n, 0.12))
+    # scrub on the flatter ground (normal facing up)
+    geo = nt.n('ShaderNodeNewGeometry')
+    up = nt.n('ShaderNodeSeparateXYZ', Vector=geo.outputs['Normal']).outputs['Z']
+    veg = nt.math('MULTIPLY', nt.math('GREATER_THAN', up, 0.82), nt.math('GREATER_THAN', _noise(nt, P, 0.8, 3, 0.5), 0.52))
+    col = nt.mix(nt.math('MULTIPLY', veg, 0.7), col, lin((88, 92, 58)))
+    bump = nt.n('ShaderNodeBump', Strength=0.8, Distance=0.6, Height=n)
+    b = principled(nt, Base_Color=col, Roughness=0.95, Normal=bump.outputs[0])
+    lp = nt.n('ShaderNodeLightPath')
+    fac = nt.math('SUBTRACT', 1.0, nt.math('EXPONENT', nt.math('DIVIDE', lp.outputs['Ray Length'], -2600.0)))
+    fac = nt.math('MULTIPLY', fac, lp.outputs['Is Camera Ray'])
+    em = nt.n('ShaderNodeEmission', Color=(0.36, 0.44, 0.56), Strength=1.0)
+    mix = nt.n('ShaderNodeMixShader', Fac=fac)
+    nt.link(b.outputs[0], mix.inputs[1]); nt.link(em.outputs[0], mix.inputs[2])
+    finish(nt, mix)
+    return m

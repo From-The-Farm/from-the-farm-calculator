@@ -86,7 +86,7 @@ def camera(name, loc, target, lens=28.0, sensor=36.0, ortho=None, dof=None, shif
         cd.type = 'ORTHO'; cd.ortho_scale = ortho
     else:
         cd.lens = lens
-    cd.clip_start = 0.05; cd.clip_end = 600.0
+    cd.clip_start = 0.05; cd.clip_end = 8000.0
     cd.shift_x, cd.shift_y = shift
     if dof:
         cd.dof.use_dof = True; cd.dof.focus_distance = dof[0]; cd.dof.aperture_fstop = dof[1]

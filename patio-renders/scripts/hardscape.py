@@ -114,27 +114,22 @@ def lounge_border_strips():
         r(1030.14, 308.88, 1038.60, 638.46),             # east (beside the walk)
     ]
 
-def build_pavers(c):
+def build_pavers(c, lounge_region=None, lounge_dz=0.0):
+    """Herringbone fields: sunken lounge (lounge_region, shifted by lounge_dz) + dining nook (at grade)."""
     rng = random.Random(11)
-    field = herringbone(P.LOUNGE_IN.buffer(-PJ / 2, join_style=2)) + herringbone(P.NOOK.buffer(-PJ / 2, join_style=2))
+    lounge_region = P.LOUNGE_IN if lounge_region is None else lounge_region
     mb = MeshBuilder()
-    for g, cut in field:
-        g = g.simplify(0.0005)
-        pr = rng.random()
-        mb.poly_prism(g, 0.0, Z_TOP, ch=0.0035, prand=pr, simplify=0)
+    for region, dz in ((lounge_region, lounge_dz), (P.NOOK, 0.0)):
+        for g, cut in herringbone(region.buffer(-PJ / 2, join_style=2)):
+            g = g.simplify(0.0005)
+            mb.poly_prism(g, 0.0 + dz, Z_TOP + dz, ch=0.0035, prand=rng.random(), simplify=0)
     me = mb.build('pavers_field')
     obj('Pavers_Field', me, c, mats._get('pavers', mats.pavers))
+    # joint sand beds
     mb = MeshBuilder()
-    for g in sailor_border(lounge_border_strips()):
-        mb.poly_prism(g, 0.0, Z_TOP, ch=0.0035, prand=rng.random(), simplify=0)
-    me = mb.build('pavers_border')
-    obj('Pavers_Border', me, c, mats._get('pavers_border', mats.pavers,
-        tones=[(0.0, mats.lin((58, 57, 56))), (0.5, mats.lin((50, 49, 48))), (0.8, mats.lin((44, 43, 43)))]))
-    # joint sand bed
-    mb = MeshBuilder()
-    mb.flat_poly(unary_union([P.LOUNGE_OUT, P.NOOK]), Z_TOP - 0.007)
+    mb.flat_poly(lounge_region, Z_TOP - 0.007 + lounge_dz)
+    mb.flat_poly(P.NOOK, Z_TOP - 0.007)
     obj('Paver_Joint_Sand', mb.build('sand'), c, mats._get('sand', mats.sand))
-    return len(field)
 
 # ------------------------------------------------------------------------------------ ground
 YARD = dict(x0=-19.0, x1=15.9, y0=-18.9, y1=18.9)    # fenced yard (house side open to the west)
@@ -142,20 +137,21 @@ YARD = dict(x0=-19.0, x1=15.9, y0=-18.9, y1=18.9)    # fenced yard (house side o
 def design_footprint():
     return unary_union([P.OUTER, P.LOUNGE_OUT])
 
-def build_ground(c):
-    """Returns (lawn_obj, yard_obj) meshes that the grass system will populate."""
+def build_ground(c, exclude=None):
+    """Proposed lawn (grass gets instanced on it) + existing red-sand yard + far ground to the horizon."""
     mb = MeshBuilder()
     mb.flat_poly(P.LAWN, 0.0)
     lawn = obj('Lawn_Proposed', mb.build('lawn'), c, mats._get('soil', mats.soil))
     yard_poly = box(YARD['x0'] - 30.0, YARD['y0'], YARD['x1'], YARD['y1']).difference(design_footprint().buffer(0.01))
+    if exclude is not None:
+        yard_poly = yard_poly.difference(exclude)
     mb = MeshBuilder()
     mb.flat_poly(yard_poly, 0.0)
-    yard = obj('Lawn_Yard', mb.build('yard'), c, mats._get('soil', mats.soil))
-    # far ground (neighbours) — plain, below grass line
+    yard = obj('Yard_Sand', mb.build('yard'), c, mats._get('red_sand', mats.red_sand))
     mb = MeshBuilder()
-    far = box(-160, -160, 160, 160).difference(box(YARD['x0'] - 30.0, YARD['y0'], YARD['x1'], YARD['y1']))
+    far = box(-3000, -3000, 3000, 3000).difference(box(YARD['x0'] - 30.0, YARD['y0'], YARD['x1'], YARD['y1']))
     mb.flat_poly(far, -0.005)
-    obj('Ground_Far', mb.build('far'), c, mats._get('far_lawn', far_lawn))
+    obj('Ground_Far', mb.build('far'), c, mats._get('red_sand', mats.red_sand))
     return lawn, yard
 
 def far_lawn(name):

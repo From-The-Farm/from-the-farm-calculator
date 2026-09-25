@@ -4,18 +4,20 @@ from PIL import Image
 
 NAMES = {
     'aerial_se': '01-overview-southeast',
-    'lawn_north': '02-lawn-to-pavilion',
-    'lounge': '03-lounge',
-    'hottub': '04-hot-tub',
-    'kitchen': '05-outdoor-kitchen',
-    'pavilion_out': '06-from-the-pavilion',
-    'nook': '07-dining-nook',
-    'walk_west': '08-west-walk',
-    'aerial_nw': '09-overview-northwest',
-    'lawn_north_dusk': '10-lawn-dusk',
-    'lounge_dusk': '11-lounge-dusk',
-    'top': '12-top-roof-on',
-    'top_noroof': '13-top-roof-off',
+    'photo3': '02-from-the-back-door',
+    'photo1': '03-from-the-side-walk',
+    'sunken': '04-sunken-lounge',
+    'lawn_north': '05-lawn-to-pavilion',
+    'lounge': '06-lounge',
+    'kitchen': '07-outdoor-kitchen',
+    'pavilion_out': '08-from-the-pavilion',
+    'nook': '09-dining-nook',
+    'walk_west': '10-west-walk',
+    'aerial_nw': '11-overview-northwest',
+    'lawn_north_dusk': '12-lawn-dusk',
+    'lounge_dusk': '13-lounge-dusk',
+    'top': '14-top-roof-on',
+    'top_noroof': '15-top-roof-off',
 }
 
 here = os.path.dirname(os.path.abspath(__file__))

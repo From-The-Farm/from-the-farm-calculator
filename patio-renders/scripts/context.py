@@ -19,7 +19,7 @@ def fence_wood(name='fence_cedar'):
     grain = mats._noise(nt, v, 1.0, 5, 0.6, dist=1.5)
     ramp = nt.n('ShaderNodeValToRGB', Fac=pr)
     cr = ramp.color_ramp
-    cols = [(0.0, mats.lin((150, 100, 66))), (0.5, mats.lin((166, 114, 76))), (1.0, mats.lin((136, 92, 62)))]
+    cols = [(0.0, mats.lin((124, 110, 96))), (0.5, mats.lin((142, 126, 108))), (1.0, mats.lin((110, 98, 86)))]
     while len(cr.elements) < 3: cr.elements.new(0.5)
     for el, (p, cc) in zip(cr.elements, cols): el.position = p; el.color = (*cc, 1.0)
     col = mats._tint(nt, ramp.outputs['Color'], mats._centered(nt, grain, 0.18))
@@ -209,7 +209,7 @@ def build_trees(c, specs, seed=1):
 
 # ------------------------------------------------------------------------------------------ neighbours
 def house_mats():
-    sid = [mats._get('siding_%d' % i, siding, col) for i, col in enumerate([(196, 186, 168), (168, 170, 166), (214, 208, 196), (150, 140, 124)])]
+    sid = [mats._get('nstucco_%d' % i, mats.stucco, col) for i, col in enumerate([(214, 196, 170), (200, 178, 152), (226, 212, 190), (206, 170, 140)])]
     roof = mats._get('shingle', shingle)
     trim = mats._get('trim_white', mats.simple, mats.lin((226, 224, 218)), 0.5)
     win = mats._get('window_glass', mats.simple, mats.lin((30, 36, 42)), 0.05, 0.0, 0.8)

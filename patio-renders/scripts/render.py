@@ -68,8 +68,12 @@ def main_run(names):
         sc.cycles.samples = int(env('SAMPLES', 128)) * (2 if dusk_mode else 1)
         cam = views.make(base)
         sc.camera = cam
+        ex = views.VIEWS[base][3]
         if base == 'top':
             sc.render.resolution_x, sc.render.resolution_y = int(env('TX', 1400)), int(env('TY', 1800))
+        elif 'res' in ex:
+            k = int(env('RX', 1920)) / 1920.0
+            sc.render.resolution_x, sc.render.resolution_y = int(ex['res'][0] * k), int(ex['res'][1] * k)
         else:
             sc.render.resolution_x, sc.render.resolution_y = int(env('RX', 1920)), int(env('RY', 1080))
         sc.render.filepath = os.path.join(OUT, '%s.png' % name)
