@@ -91,9 +91,7 @@ def build_house(c):
     posts = [HX1 - 0.12, -10.9, -13.6, -16.3, -18.85]
     for x in posts:
         z0 = DECK_Z if x < DECK_X1 else Z_TOP
-        mb.box(x - 0.07, PORCH_Y - 0.07, z0, x + 0.07, PORCH_Y + 0.07, 2.72)
-    # downspout at the east post
-    mb.box(HX1 + 0.05, y_eave - 0.02, 0.0, HX1 + 0.12, y_eave + 0.05, pz_front - 0.1)
+        mb.box(x - 0.05, PORCH_Y - 0.05, z0, x + 0.05, PORCH_Y + 0.05, 2.72)   # slim black steel posts
     obj('Porch_Trim', mb.build('porch_trim'), c, trim)
     mb = MeshBuilder()
     mb.box(PORCH_X0 - 0.1, HY1, 2.66, HX1 + 0.1, PORCH_Y + 0.1, 2.70)
@@ -118,7 +116,7 @@ def build_house(c):
     mb = MeshBuilder()
     mb.box(ex1 - 0.09, ey0 - 0.1, 2.70, ex1 + 0.09, ey1 + 0.1, 2.96)
     for y in (ey0 + 0.1, (ey0 + ey1) / 2):
-        mb.box(ex1 - 0.07, y - 0.07, Z_TOP, ex1 + 0.07, y + 0.07, 2.72)
+        mb.box(ex1 - 0.05, y - 0.05, Z_TOP, ex1 + 0.05, y + 0.05, 2.72)
     obox(mb, (ex1 + 0.32, (ey0 + ey1) / 2, pz_wall - drop - 0.07), Vector((0, 1, 0)), Vector((1, 0, 0)), Vector((0, 0, 1)), (ey1 - ey0) + 0.3, 0.04, 0.24)
     obj('Porch_Trim_E', mb.build('porch_trim_e'), c, trim)
     mb = MeshBuilder()
