@@ -110,7 +110,7 @@ def run():
     for o in list(bpy.data.objects):
         n = o.name
         import re
-        if o.type in ('LIGHT', 'CAMERA') or n.startswith(('Ground_Far', 'Tree', 'FarTree', 'Flames', 'Spot', 'FireGlow', 'RedCliffs')) or re.match(r'House\d', n):
+        if o.type in ('LIGHT', 'CAMERA') or n.startswith(('Tree', 'FarTree', 'Flames', 'Spot', 'FireGlow', 'RedCliffs')) or re.match(r'House\d', n):
             bpy.data.objects.remove(o, do_unlink=True)
     cache = {}
     for o in list(bpy.data.objects):
