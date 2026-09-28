@@ -1,0 +1,987 @@
+<title>Yard Tour Upload</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+  :root {
+    --paper: #edeeea;
+    --sheet: #f7f7f4;
+    --ink: #1e2220;
+    --muted: #59615c;
+    --rule: #c3c8c1;
+    --cedar: #9a4f28;
+    --cedar-soft: rgba(154, 79, 40, 0.10);
+    --ok: #3d6b45;
+    --warn: #8a5a12;
+    --bad: #a23a2c;
+    --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --body: "Public Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #121513;
+      --sheet: #1a1e1c;
+      --ink: #e3e6e1;
+      --muted: #9aa39d;
+      --rule: #2e3430;
+      --cedar: #d98c5e;
+      --cedar-soft: rgba(217, 140, 94, 0.12);
+      --ok: #8cc095;
+      --warn: #e0b060;
+      --bad: #ee8a7a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #121513;
+    --sheet: #1a1e1c;
+    --ink: #e3e6e1;
+    --muted: #9aa39d;
+    --rule: #2e3430;
+    --cedar: #d98c5e;
+    --cedar-soft: rgba(217, 140, 94, 0.12);
+    --ok: #8cc095;
+    --warn: #e0b060;
+    --bad: #ee8a7a;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: clamp(20px, 4vw, 44px) 56px;
+    display: grid;
+    gap: 28px;
+  }
+
+  /* title block, same drafting-sheet convention as the renders page */
+  .titleblock {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    border: 1.5px solid var(--ink);
+    background: var(--sheet);
+  }
+  .tb-name {
+    padding: clamp(16px, 3vw, 26px);
+    border-right: 1.5px solid var(--ink);
+    display: grid;
+    gap: 10px;
+    align-content: end;
+  }
+  .eyebrow, .k, .label {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-stretch: 72%;
+    font-weight: 750;
+    font-size: clamp(38px, 6.5vw, 70px);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+  .lede { margin: 2px 0 0; max-width: 56ch; color: var(--muted); }
+  .tb-cells { display: grid; grid-template-columns: 1fr 1fr; }
+  .cell {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    gap: 2px;
+    align-content: start;
+    min-width: 0;
+  }
+  .cell:nth-child(odd) { border-right: 1px solid var(--rule); }
+  .cell:nth-last-child(-n+2) { border-bottom: 0; }
+  .v {
+    font-family: var(--display);
+    font-stretch: 85%;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  /* drop zone */
+  .drop {
+    border: 2px dashed var(--rule);
+    background: var(--sheet);
+    padding: clamp(22px, 5vw, 44px) clamp(16px, 4vw, 36px);
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 12px;
+    transition: border-color .15s, background-color .15s;
+  }
+  .drop.over { border-color: var(--cedar); background: var(--cedar-soft); }
+  .drop h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-stretch: 80%;
+    font-weight: 700;
+    font-size: clamp(24px, 4vw, 32px);
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .drop p { margin: 0; color: var(--muted); max-width: 52ch; }
+  .fname { font-family: var(--mono); font-size: 13.5px; color: var(--ink); overflow-wrap: anywhere; }
+  .btn {
+    appearance: none;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--sheet);
+    font: 600 15px/1 var(--body);
+    padding: 12px 20px;
+    cursor: pointer;
+  }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn:hover { background: var(--cedar); border-color: var(--cedar); color: #fff; }
+  .btn:focus-visible, textarea:focus-visible { outline: 3px solid var(--cedar); outline-offset: 2px; }
+  .btn[disabled] { opacity: .45; cursor: default; background: var(--ink); border-color: var(--ink); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* how it works */
+  .steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1.5px solid var(--ink);
+  }
+  .steps li {
+    padding: 14px 16px 4px 0;
+    display: grid;
+    gap: 6px;
+    align-content: start;
+  }
+  .steps li + li { padding-left: 16px; border-left: 1px solid var(--rule); }
+  .steps .n {
+    font-family: var(--display);
+    font-stretch: 72%;
+    font-weight: 750;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--cedar);
+  }
+  .steps p { margin: 0; font-size: 15px; }
+
+  /* progress: a drawing scale bar that fills */
+  .run {
+    border: 1.5px solid var(--ink);
+    background: var(--sheet);
+    padding: clamp(16px, 3vw, 24px);
+    display: grid;
+    gap: 16px;
+  }
+  .run-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
+  .run-head h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-stretch: 80%;
+    font-weight: 700;
+    font-size: 24px;
+    text-transform: uppercase;
+  }
+  .status { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .status.ok { color: var(--ok); }
+  .status.warn { color: var(--warn); }
+  .status.bad { color: var(--bad); }
+  .scale { display: grid; gap: 4px; }
+  .bar {
+    position: relative;
+    height: 16px;
+    border: 1.5px solid var(--ink);
+    background: repeating-linear-gradient(90deg, var(--ink) 0 10%, transparent 10% 20%);
+    background-color: var(--sheet);
+    overflow: hidden;
+  }
+  .bar .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    background: var(--cedar);
+    transition: width .3s ease;
+  }
+  .ticks {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px 16px;
+  }
+  .facts div { display: grid; gap: 2px; min-width: 0; }
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .strip canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    display: block;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .notes { display: grid; gap: 8px; }
+  .notes-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 120px;
+    resize: vertical;
+    padding: 12px 14px;
+    font: 15px/1.5 var(--body);
+    color: var(--ink);
+    background: var(--sheet);
+    border: 1.5px solid var(--rule);
+  }
+  textarea:focus { border-color: var(--ink); }
+  .fine { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 70ch; }
+
+  @media (max-width: 720px) {
+    .titleblock { grid-template-columns: 1fr; }
+    .tb-name { border-right: 0; border-bottom: 1.5px solid var(--ink); }
+    .steps { grid-template-columns: 1fr; }
+    .steps li + li { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule); }
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bar .fill, .drop { transition: none; }
+  }
+</style>
+
+<main class="wrap">
+  <header class="titleblock">
+    <div class="tb-name">
+      <div class="eyebrow">Zitting backyard &middot; 3D walk-through</div>
+      <h1>Yard tour upload</h1>
+      <p class="lede">Drop your yard video here. Your browser picks the sharpest frames and sends them to Claude, who builds the walk-through model of the yard from them.</p>
+    </div>
+    <div class="tb-cells">
+      <div class="cell"><span class="k">Video</span><span class="v" id="c-file">Not chosen</span></div>
+      <div class="cell"><span class="k">Length</span><span class="v" id="c-len">&ndash;</span></div>
+      <div class="cell"><span class="k">Frames</span><span class="v" id="c-frames">&ndash;</span></div>
+      <div class="cell"><span class="k">Sent</span><span class="v" id="c-sent">&ndash;</span></div>
+    </div>
+  </header>
+
+  <section class="drop" id="drop" aria-labelledby="drop-h">
+    <h2 id="drop-h">Drop the video here</h2>
+    <p>Your file is <span class="fname">PXL_20260928_163324726.mp4</span> on your Desktop.</p>
+    <label class="btn" for="file" id="pick">Choose video</label>
+    <input class="visually-hidden" type="file" id="file" accept="video/*,.mp4,.mov">
+    <p class="status" id="connect">Connecting to Claude&hellip;</p>
+  </section>
+
+  <ol class="steps" aria-label="What happens">
+    <li><span class="n">1</span><p>You choose the video. The file itself stays on your Mac.</p></li>
+    <li><span class="n">2</span><p>Your browser plays through it and keeps the sharpest frame from every third of a second or so.</p></li>
+    <li><span class="n">3</span><p>Those still frames upload to this page's private storage, where Claude picks them up.</p></li>
+  </ol>
+
+  <section class="run" id="run" hidden aria-live="polite">
+    <div class="run-head">
+      <h2 id="run-h">Sending frames</h2>
+      <span class="status" id="status">Starting&hellip;</span>
+    </div>
+    <div class="scale">
+      <div class="bar" role="progressbar" aria-labelledby="run-h" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar"><div class="fill" id="fill"></div></div>
+      <div class="ticks" id="ticks"><span>0</span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="facts">
+      <div><span class="k">Frames sent</span><span class="v" id="f-sent">0</span></div>
+      <div><span class="k">Uploaded</span><span class="v" id="f-mb">0 MB</span></div>
+      <div><span class="k">Elapsed</span><span class="v" id="f-el">0:00</span></div>
+      <div><span class="k">Left</span><span class="v" id="f-left">&ndash;</span></div>
+    </div>
+    <div class="strip" id="strip" aria-label="Latest frames"></div>
+    <div class="actions">
+      <button class="btn ghost" type="button" id="stop">Pause</button>
+      <button class="btn" type="button" id="resume" hidden>Continue</button>
+    </div>
+    <p class="fine">Keep this tab open until it says done. If it stops, choose the same video again and it picks up where it left off.</p>
+  </section>
+
+  <section class="notes" aria-labelledby="notes-l">
+    <div class="notes-head">
+      <label class="label" id="notes-l" for="notes">Notes for Claude (optional)</label>
+      <span class="status" id="notes-state"></span>
+    </div>
+    <textarea id="notes" placeholder="Anything you said while filming, where you started and ended, which rocks you mean for the fountains, where the office door is&hellip;"></textarea>
+  </section>
+
+  <p class="fine">Frames are redrawn in your browser before they're sent, so the video's location tag and its sound are left out. Only people with access to this page can see them.</p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.4/dist/mp4box.all.min.js"></script>
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // ---------- settings ----------
+  const TARGET_FRAMES = 480;    // aim for about this many frames in total
+  const MIN_FPS = 2, MAX_FPS = 5;
+  const MAX_FRAMES = 720;
+  const LONG_SIDES = [1600, 1440, 1280, 1120, 960];
+  const QUALITIES = [0.9, 0.85, 0.8, 0.75];
+  const GRIDS = [[2, 2], [3, 2], [3, 3], [4, 3], [4, 4]];   // frames per uploaded sheet (cols, rows)
+  const PAGE = 100;             // frame entries per db document
+  const MAX_INFLIGHT = 3;       // parallel uploads
+
+  let db = null, assets = null;
+  let run = null;               // the active run
+  let chosenFile = null;
+  let wakeLock = null;
+
+  // ---------- small ui helpers ----------
+  function setStatus(text, kind) {
+    const el = $("status");
+    el.textContent = text;
+    el.className = "status" + (kind ? " " + kind : "");
+  }
+  function fmtTime(s) {
+    if (!isFinite(s) || s < 0) return "\u2013";
+    s = Math.round(s);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(r).padStart(2, "0");
+  }
+  function fmtMB(b) { return (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + " MB"; }
+  function setCells() {
+    if (!run) return;
+    $("c-file").textContent = run.name;
+    $("c-len").textContent = fmtTime(run.duration);
+    $("c-frames").textContent = run.windows + " @ " + run.longSide + " px";
+    $("c-sent").textContent = run.sentCount + " of " + run.windows;
+  }
+  function setTicks(n) {
+    const t = $("ticks").children;
+    for (let i = 0; i < t.length; i++) t[i].textContent = Math.round((n * i) / (t.length - 1));
+  }
+  function updateProgress() {
+    if (!run) return;
+    const pct = run.windows ? (100 * run.sentCount) / run.windows : 0;
+    $("fill").style.width = pct.toFixed(1) + "%";
+    $("bar").setAttribute("aria-valuenow", String(Math.round(pct)));
+    $("f-sent").textContent = run.sentCount + " / " + run.windows;
+    $("f-mb").textContent = fmtMB(run.sentBytes);
+    const el = (performance.now() - run.t0) / 1000;
+    $("f-el").textContent = fmtTime(el);
+    const doneNow = run.sentCount - run.sentAtStart;
+    const left = run.windows - run.sentCount;
+    $("f-left").textContent = doneNow > 8 && left > 0 ? "about " + fmtTime((el / doneNow) * left) : (left === 0 ? "0:00" : "\u2013");
+    setCells();
+  }
+  const strip = [];
+  function addThumb(src) {
+    const holder = $("strip");
+    let c;
+    if (strip.length < 6) { c = document.createElement("canvas"); c.width = 192; c.height = 108; holder.appendChild(c); strip.push(c); }
+    else { c = strip.shift(); holder.appendChild(c); strip.push(c); }
+    const g = c.getContext("2d");
+    const s = Math.max(c.width / src.width, c.height / src.height);
+    const w = src.width * s, h = src.height * s;
+    g.drawImage(src, (c.width - w) / 2, (c.height - h) / 2, w, h);
+  }
+
+  // ---------- capabilities ----------
+  async function connect() {
+    const el = $("connect");
+    if (!window.claude || typeof window.claude.use !== "function") {
+      el.textContent = "Open this page from the claude.ai link Claude sent. Uploads only work there.";
+      el.className = "status bad";
+      return;
+    }
+    try {
+      [db, assets] = await Promise.all([window.claude.use("db"), window.claude.use("assets")]);
+    } catch (e) { db = null; assets = null; }
+    if (!db || !assets) {
+      el.textContent = "Uploads need edit access. Open this page from the link Claude sent while signed in to your own account.";
+      el.className = "status bad";
+      return;
+    }
+    el.textContent = "Ready. Choose the video to start.";
+    el.className = "status ok";
+    loadNotes();
+    try {
+      const cur = await db.doc("upload/current").get();
+      if (cur.exists) {
+        const d = cur.data();
+        if (d.status === "done") {
+          el.textContent = "Done earlier: " + d.sent + " frames from " + d.name + " are with Claude. Choose a video only if you want to send another one.";
+        } else if (d.sent > 0) {
+          el.textContent = "An earlier upload stopped at " + d.sent + " of " + d.windows + " frames. Choose " + d.name + " again to pick up where it left off.";
+          el.className = "status warn";
+        }
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  // ---------- notes ----------
+  let notesTimer = null, notesBusy = false, notesDirty = false;
+  async function loadNotes() {
+    try {
+      const s = await db.doc("upload/notes").get();
+      if (s.exists && typeof s.data().text === "string" && !$("notes").value) $("notes").value = s.data().text;
+    } catch (e) { /* ignore */ }
+  }
+  async function saveNotes() {
+    if (!db) { $("notes-state").textContent = "Can't save here"; return; }
+    if (notesBusy) { notesDirty = true; return; }
+    notesBusy = true;
+    $("notes-state").textContent = "Saving\u2026";
+    try {
+      await db.doc("upload/notes").set({ text: $("notes").value.slice(0, 20000), updatedAt: new Date().toISOString() });
+      $("notes-state").textContent = "Saved";
+    } catch (e) {
+      $("notes-state").textContent = "Not saved (" + (e && e.code || "error") + ")";
+    }
+    notesBusy = false;
+    if (notesDirty) { notesDirty = false; saveNotes(); }
+  }
+  $("notes").addEventListener("input", () => {
+    clearTimeout(notesTimer);
+    $("notes-state").textContent = "\u2026";
+    notesTimer = setTimeout(saveNotes, 900);
+  });
+
+  // ---------- serialized db writes (one write at a time per document) ----------
+  const writers = new Map();
+  function writeDoc(path, getBody) {
+    let w = writers.get(path);
+    if (!w) { w = { busy: false, dirty: false, getBody: null, waiters: [] }; writers.set(path, w); }
+    w.getBody = getBody;
+    return new Promise((resolve) => {
+      w.waiters.push(resolve);
+      if (w.busy) { w.dirty = true; return; }
+      (async function loop() {
+        w.busy = true;
+        do {
+          w.dirty = false;
+          const waiters = w.waiters.splice(0);
+          let tries = 0;
+          for (;;) {
+            try { await db.doc(path).set(w.getBody()); break; }
+            catch (e) {
+              if ((e && (e.code === "unavailable" || e.code === "resource_exhausted")) && tries < 4) { tries++; await sleep(1500 * tries + Math.random() * 500); continue; }
+              console.warn("db write failed", path, e);
+              break;
+            }
+          }
+          waiters.forEach((r) => r());
+        } while (w.dirty);
+        w.busy = false;
+      })();
+    });
+  }
+
+  // ---------- planning ----------
+  function planFor(duration) {
+    let fps = TARGET_FRAMES / duration;
+    fps = Math.min(MAX_FPS, Math.max(MIN_FPS, fps));
+    fps = Math.round(fps * 4) / 4;
+    let windows = Math.max(1, Math.floor(duration * fps));
+    if (windows > MAX_FRAMES) { windows = MAX_FRAMES; fps = windows / duration; }
+    return { fps, windows };
+  }
+
+  function sharpness(src, sw, sh) {
+    // Variance of a 4-neighbour Laplacian on a small grey copy: higher = sharper.
+    const c = sharpness.c || (sharpness.c = document.createElement("canvas"));
+    const W = 320, H = Math.max(90, Math.round(320 * sh / sw));
+    if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+    const g = sharpness.g || (sharpness.g = c.getContext("2d", { willReadFrequently: true }));
+    g.drawImage(src, 0, 0, W, H);
+    const d = g.getImageData(0, 0, W, H).data;
+    const y = new Float32Array(W * H);
+    for (let i = 0, j = 0; i < y.length; i++, j += 4) y[i] = 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
+    let s = 0, s2 = 0, n = 0;
+    for (let r = 1; r < H - 1; r++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = r * W + x;
+        const l = 4 * y[i] - y[i - 1] - y[i + 1] - y[i - W] - y[i + W];
+        s += l; s2 += l * l; n++;
+      }
+    }
+    const m = s / n;
+    return s2 / n - m * m;
+  }
+
+  // Draws a decoded frame (or the <video>) into `canvas`, applying the track rotation.
+  function drawRotated(canvas, src, srcW, srcH, rot) {
+    const g = canvas.getContext("2d");
+    g.save();
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.translate(canvas.width / 2, canvas.height / 2);
+    g.rotate((rot * Math.PI) / 180);
+    const swap = rot === 90 || rot === -90 || rot === 270;
+    const w = swap ? canvas.height : canvas.width;
+    const h = swap ? canvas.width : canvas.height;
+    g.drawImage(src, 0, 0, srcW, srcH, -w / 2, -h / 2, w, h);
+    g.restore();
+  }
+
+  function encode(canvas, q) {
+    return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("encode failed"))), "image/jpeg", q));
+  }
+
+  // ---------- upload with the codes the platform documents ----------
+  async function uploadJPEG(blob) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await assets.upload(blob, { type: "image/jpeg" });
+      } catch (e) {
+        const code = e && e.code;
+        if (code === "rate_limited" && attempt < 6) {
+          setStatus("The upload service asked to slow down. Waiting a moment\u2026", "warn");
+          await sleep(6000 * (attempt + 1));
+          continue;
+        }
+        if ((code === "store_unavailable" || code === "upstream_error") && attempt < 2) { await sleep(2500); continue; }
+        throw e;
+      }
+    }
+  }
+
+  // ---------- the run ----------
+  function fileKey(f) { return [f.name, f.size, f.lastModified].join("|"); }
+
+  async function startRun(file) {
+    if (run && run.active) return;
+    if (!db || !assets) { $("connect").textContent = "Uploads need edit access. Open this page from the link Claude sent while signed in."; return; }
+    chosenFile = file;
+    $("run").hidden = false;
+    $("resume").hidden = true;
+    $("stop").hidden = false;
+    $("stop").disabled = false;
+    setStatus("Reading the video\u2026");
+    $("c-file").textContent = file.name;
+    try {
+      await doRun(file);
+    } catch (e) {
+      console.error(e);
+      if (run) run.active = false;
+      const code = e && e.code;
+      let msg = e && e.userMessage ? e.userMessage : "Something went wrong: " + (e && (e.message || code) || e) + ". Choose the video again to retry.";
+      if (code === "quota_or_state") msg = "This page's storage is full after " + (run ? run.sentCount : 0) + " frames. Claude can work with what's there.";
+      else if (code === "upstream_auth") msg = "Your sign-in expired. Reload the page and choose the video again; it continues where it stopped.";
+      else if (code === "not_granted" || code === "capability_disabled" || code === "capability_removed") msg = "Uploading isn't available in this view. Open the page from Claude's link on claude.ai.";
+      setStatus(msg, "bad");
+      $("stop").hidden = true;
+      $("resume").hidden = !(run && run.sentCount < run.windows);
+    }
+    releaseWake();
+  }
+
+  async function holdWake() {
+    try { if (navigator.wakeLock && !wakeLock) wakeLock = await navigator.wakeLock.request("screen"); } catch (e) { wakeLock = null; }
+  }
+  function releaseWake() { try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null; }
+
+  async function probe(file) {
+    // Returns {duration, width, height, rot, decoderPath, ...}
+    let info = null;
+    if (typeof VideoDecoder !== "undefined" && typeof MP4Box !== "undefined") {
+      try { info = await probeMP4(file); } catch (e) { console.warn("mp4 probe failed", e); info = null; }
+    }
+    if (!info) info = await probeElement(file);
+    return info;
+  }
+
+  async function probeMP4(file) {
+    const mp4 = MP4Box.createFile(false);
+    let ready = null, failed = null;
+    mp4.onReady = (i) => { ready = i; };
+    mp4.onError = (e) => { failed = e; };
+    let pos = 0;
+    const CH = 4 * 1048576;
+    let guard = 0;
+    while (!ready && !failed && pos < file.size && guard++ < 100000) {
+      const buf = await file.slice(pos, Math.min(file.size, pos + CH)).arrayBuffer();
+      buf.fileStart = pos;
+      const next = mp4.appendBuffer(buf);
+      if (ready || failed) break;
+      pos = typeof next === "number" && next > pos ? next : pos + buf.byteLength;
+    }
+    if (!ready && !failed) mp4.flush();
+    if (!ready) throw new Error("no moov");
+    const vt = ready.videoTracks && ready.videoTracks[0];
+    if (!vt) throw new Error("no video track");
+    const trak = mp4.getTrackById(vt.id);
+    const samples = trak.samples;
+    if (!samples || !samples.length) throw new Error("no samples");
+    const entry = trak.mdia.minf.stbl.stsd.entries[0];
+    const box = entry.avcC || entry.hvcC;
+    let description;
+    if (box) {
+      const ds = new DataStream(undefined, 0, DataStream.BIG_ENDIAN);
+      box.write(ds);
+      description = new Uint8Array(ds.buffer, 8);
+    }
+    let codec = vt.codec;
+    if (codec.startsWith("vp08")) codec = "vp8";
+    const config = { codec, codedWidth: vt.video.width, codedHeight: vt.video.height };
+    if (description) config.description = description;
+    const sup = await VideoDecoder.isConfigSupported(config);
+    if (!sup || !sup.supported) throw new Error("codec not supported: " + codec);
+    const m = vt.matrix || [65536, 0, 0, 0, 65536, 0, 0, 0, 1 << 30];
+    let rot = Math.round((Math.atan2(m[1], m[0]) * 180) / Math.PI);
+    rot = ((rot % 360) + 360) % 360;
+    if (rot !== 0 && rot !== 90 && rot !== 180 && rot !== 270) rot = 0;
+    const ts = samples[0].timescale;
+    let dur = 0;
+    for (const s of samples) dur = Math.max(dur, (s.cts + s.duration) / ts);
+    const width = vt.video.width, height = vt.video.height;
+    const dispW = rot % 180 ? height : width, dispH = rot % 180 ? width : height;
+    return { path: "webcodecs", duration: dur, width: dispW, height: dispH, srcW: width, srcH: height, rot, config, samples, ts, codec };
+  }
+
+  function probeElement(file) {
+    return new Promise((resolve, reject) => {
+      const v = document.createElement("video");
+      v.muted = true; v.playsInline = true; v.preload = "auto";
+      const url = URL.createObjectURL(file);
+      const fail = () => {
+        const e = new Error("video element could not read the file");
+        e.userMessage = "This browser can't read the video. Open this page in Chrome or Safari on your Mac and choose it again.";
+        reject(e);
+      };
+      v.addEventListener("error", fail, { once: true });
+      v.addEventListener("loadedmetadata", () => {
+        if (!v.videoWidth || !isFinite(v.duration)) { fail(); return; }
+        resolve({ path: "element", duration: v.duration, width: v.videoWidth, height: v.videoHeight, srcW: v.videoWidth, srcH: v.videoHeight, rot: 0, video: v, url });
+      }, { once: true });
+      v.src = url;
+    });
+  }
+
+  async function doRun(file) {
+    setStatus("Reading the video\u2026");
+    const info = await probe(file);
+    const key = fileKey(file);
+
+    // resume if the same file was started before
+    let prior = null;
+    try { const cur = await db.doc("upload/current").get(); if (cur.exists) prior = cur.data(); } catch (e) {}
+    let runId, plan, longSide, quality, grid, done = new Map();
+    if (prior && prior.key === key && prior.status !== "done") {
+      runId = prior.runId;
+      plan = { fps: prior.fps, windows: prior.windows };
+      longSide = prior.longSide; quality = prior.quality; grid = prior.grid;
+      const pages = await db.collection("runs/" + runId + "/pages").get();
+      pages.docs.forEach((d) => (d.data().items || []).forEach((it) => done.set(it.w, it)));
+    } else {
+      runId = "r" + Date.now().toString(36);
+      plan = planFor(info.duration);
+      longSide = LONG_SIDES[0]; quality = QUALITIES[0]; grid = null;
+    }
+
+    // how much room this page has
+    let usage = null;
+    try { usage = (await assets.list()).usage; } catch (e) { usage = null; }
+    const availFiles = usage ? usage.maxFiles - usage.files - 4 : Infinity;
+    const availBytes = usage ? usage.maxBytes - usage.bytes - 2 * 1048576 : Infinity;
+    const remainingWins = plan.windows - done.size;
+    if (!grid) {
+      grid = GRIDS.find(([c, r]) => Math.ceil(remainingWins / (c * r)) <= availFiles) || GRIDS[GRIDS.length - 1];
+    }
+
+    run = {
+      active: true, stop: false, id: runId, key, name: file.name, duration: info.duration,
+      fps: plan.fps, windows: plan.windows, longSide, quality, grid,
+      sentCount: done.size, sentAtStart: done.size, sentBytes: 0, t0: performance.now(),
+      done, entries: new Map(), inflight: 0, sheetsSent: 0, info, bytesThisRun: 0, framesThisRun: 0,
+      width: info.width, height: info.height,
+    };
+    for (const it of done.values()) run.sentBytes += it.b || 0;
+    setTicks(run.windows);
+    setCells();
+    updateProgress();
+    const baseMeta = () => ({
+      runId, key, name: file.name, sizeBytes: file.size, duration: run.duration, fps: run.fps, windows: run.windows,
+      longSide: run.longSide, quality: run.quality, grid: run.grid, videoWidth: info.width, videoHeight: info.height,
+      rotation: info.rot, decoder: info.path, codec: info.codec || "", sent: run.sentCount, sentBytes: run.sentBytes,
+      status: run.stop ? "paused" : (run.sentCount >= run.windows ? "done" : "running"), updatedAt: new Date().toISOString(),
+    });
+    await writeDoc("upload/current", baseMeta);
+    writeDoc("runs/" + runId, baseMeta);
+    await holdWake();
+
+    // frame geometry
+    const aspect = info.width / info.height;
+    const fw = aspect >= 1 ? run.longSide : Math.round(run.longSide * aspect);
+    const fh = aspect >= 1 ? Math.round(run.longSide / aspect) : run.longSide;
+    run.fw = fw; run.fh = fh;
+    const best = document.createElement("canvas");
+    best.width = fw; best.height = fh;
+    const sheet = document.createElement("canvas");
+    sheet.width = fw * run.grid[0]; sheet.height = fh * run.grid[1];
+    const sg = sheet.getContext("2d");
+    let cells = [];               // [{w, t, s, cell}]
+    let calibrated = done.size > 0;
+
+    async function flushSheet() {
+      if (!cells.length) return;
+      const batch = cells; cells = [];
+      const cleanup = () => sg.clearRect(0, 0, sheet.width, sheet.height);
+      const cols = run.grid[0], rows = run.grid[1];
+      let out = sheet;
+      const used = Math.ceil(batch.length / cols);
+      if (used < rows) {
+        out = document.createElement("canvas");
+        out.width = sheet.width; out.height = fh * used;
+        out.getContext("2d").drawImage(sheet, 0, 0);
+      }
+      if (!calibrated) {
+        calibrated = true;
+        // pick quality/size so all frames fit the page's storage
+        let blob = await encode(out, run.quality);
+        const perFrame = blob.size / batch.length;
+        const need = perFrame * (run.windows - run.done.size);
+        if (need > availBytes * 0.85) {
+          let ok = false;
+          for (const q of QUALITIES) {
+            const b = await encode(out, q);
+            if ((b.size / batch.length) * (run.windows - run.done.size) <= availBytes * 0.85) { run.quality = q; ok = true; break; }
+          }
+          if (!ok) {
+            const ratio = Math.sqrt((availBytes * 0.8) / need);
+            const target = LONG_SIDES.find((L) => L <= run.longSide * ratio) || LONG_SIDES[LONG_SIDES.length - 1];
+            run.quality = QUALITIES[1];
+            run.shrink = target / run.longSide;
+            run.longSide = target;
+          }
+          writeDoc("upload/current", baseMeta);
+        }
+      }
+      // keep the running average inside the page's storage
+      if (isFinite(availBytes) && run.framesThisRun > 0) {
+        const avg = run.bytesThisRun / run.framesThisRun;
+        const left = run.windows - run.done.size;
+        if (avg * left > (availBytes - run.bytesThisRun) * 0.92) {
+          if (run.quality > 0.62) run.quality = Math.round((run.quality - 0.07) * 100) / 100;
+          else { run.shrink = (run.shrink || 1) * 0.85; run.longSide = Math.round(run.longSide * 0.85); }
+        }
+      }
+      let src = out;
+      if (run.shrink && run.shrink < 1) {
+        src = document.createElement("canvas");
+        src.width = Math.round(out.width * run.shrink); src.height = Math.round(out.height * run.shrink);
+        src.getContext("2d").drawImage(out, 0, 0, src.width, src.height);
+      }
+      const blob = await encode(src, run.quality);
+      cleanup();
+      while (run.inflight >= MAX_INFLIGHT) await sleep(40);
+      run.inflight++;
+      const sheetW = src.width, sheetH = src.height;
+      const p = uploadJPEG(blob).then((res) => {
+        run.inflight--;
+        run.sheetsSent++;
+        run.sentBytes += blob.size;
+        run.bytesThisRun += blob.size;
+        run.framesThisRun += batch.length;
+        const touched = new Set();
+        batch.forEach((c, i) => {
+          const it = { w: c.w, t: +c.t.toFixed(3), s: Math.round(c.s), id: res.id, cell: i, cols: run.grid[0], fw: Math.round(fw * (run.shrink || 1)), fh: Math.round(fh * (run.shrink || 1)), sw: sheetW, sh: sheetH, b: Math.round(blob.size / batch.length) };
+          run.done.set(c.w, it);
+          touched.add(Math.floor(c.w / PAGE));
+        });
+        run.sentCount = run.done.size;
+        updateProgress();
+        setStatus("Sending frames\u2026");
+        touched.forEach((pg) => {
+          const pid = "p" + String(pg).padStart(3, "0");
+          writeDoc("runs/" + runId + "/pages/" + pid, () => ({ items: [...run.done.values()].filter((it) => Math.floor(it.w / PAGE) === pg).sort((a, b) => a.w - b.w) }));
+        });
+        if (run.sheetsSent % 10 === 0) writeDoc("upload/current", baseMeta);
+      }, (e) => { run.inflight--; run.error = e; });
+      run.pending.push(p);
+    }
+    run.pending = [];
+
+    async function takeWindow(w, t, s) {
+      if (run.error) throw run.error;
+      addThumb(best);
+      const cols = run.grid[0];
+      const k = cells.length;
+      sg.drawImage(best, (k % cols) * fw, Math.floor(k / cols) * fh);
+      cells.push({ w, t, s, cell: k });
+      if (cells.length >= run.grid[0] * run.grid[1]) await flushSheet();
+    }
+
+    if (info.path === "webcodecs") await decodeAll(info, best, takeWindow);
+    else await seekAll(info, best, takeWindow);
+
+    if (!run.stop) await flushSheet();
+    await Promise.all(run.pending);
+    if (run.error) throw run.error;
+    run.active = false;
+    await writeDoc("upload/current", baseMeta);
+    await writeDoc("runs/" + runId, baseMeta);
+    updateProgress();
+    $("stop").hidden = true;
+    if (run.stop) {
+      setStatus("Paused at " + run.sentCount + " of " + run.windows + " frames.", "warn");
+      $("resume").hidden = false;
+    } else {
+      $("run-h").textContent = "Done";
+      setStatus("All " + run.sentCount + " frames are with Claude. You can close this tab.", "ok");
+      $("connect").textContent = "Done. " + run.sentCount + " frames sent.";
+      $("connect").className = "status ok";
+    }
+  }
+
+  // WebCodecs: decode every frame, keep the sharpest one in each time window.
+  async function decodeAll(info, best, takeWindow) {
+    const fps = run.fps;
+    const samples = info.samples, ts = info.ts;
+    let curW = -1, bestS = -1, bestT = 0, err = null;
+    const finish = async () => { if (curW >= 0 && curW < run.windows && bestS >= 0 && !run.done.has(curW)) await takeWindow(curW, bestT, bestS); };
+    const queue = [];             // frames waiting to be scored
+    const decoder = new VideoDecoder({
+      output: (frame) => queue.push(frame),
+      error: (e) => { err = e; },
+    });
+    decoder.configure(info.config);
+
+    // start at the key frame before the first window we still need
+    let firstNeeded = 0;
+    while (firstNeeded < run.windows && run.done.has(firstNeeded)) firstNeeded++;
+    if (firstNeeded >= run.windows) return;
+    const tNeed = firstNeeded / fps;
+    let start = 0;
+    for (let i = 0; i < samples.length; i++) {
+      if (samples[i].is_sync && samples[i].cts / ts <= tNeed) start = i;
+      if (samples[i].dts / ts > tNeed + 5) break;
+    }
+
+    // read the file in big slices; samples are mostly in file order
+    let bufStart = -1, buf = null;
+    const SL = 16 * 1048576;
+    async function bytes(off, size) {
+      if (!buf || off < bufStart || off + size > bufStart + buf.byteLength) {
+        bufStart = off;
+        buf = new Uint8Array(await chosenFile.slice(off, Math.min(chosenFile.size, off + Math.max(SL, size))).arrayBuffer());
+      }
+      return buf.subarray(off - bufStart, off - bufStart + size);
+    }
+
+    async function drain(all) {
+      while (queue.length) {
+        const frame = queue.shift();
+        const t = frame.timestamp / 1e6;
+        const w = Math.floor(t * fps + 1e-6);
+        if (w !== curW) { await finish(); curW = w; bestS = -1; }
+        if (w < run.windows && !run.done.has(w)) {
+          const s = sharpness(frame, frame.displayWidth, frame.displayHeight);
+          if (s > bestS) { bestS = s; bestT = t; drawRotated(best, frame, frame.displayWidth, frame.displayHeight, info.rot); }
+        }
+        frame.close();
+      }
+      if (all) await finish();
+    }
+
+    for (let i = start; i < samples.length; i++) {
+      if (run.stop) break;
+      if (err) throw err;
+      if (run.error) throw run.error;
+      const s = samples[i];
+      if (s.cts / ts > (run.windows + 1) / fps && s.is_sync) break;
+      const data = await bytes(s.offset, s.size);
+      decoder.decode(new EncodedVideoChunk({ type: s.is_sync ? "key" : "delta", timestamp: Math.round((1e6 * s.cts) / ts), duration: Math.round((1e6 * s.duration) / ts), data }));
+      while (decoder.decodeQueueSize > 8) { if (queue.length) await drain(false); else await sleep(1); }
+      if (queue.length) await drain(false);
+      if (i % 30 === 0) updateProgress();
+    }
+    if (!run.stop) {
+      try { await decoder.flush(); } catch (e) { if (!err) err = e; }
+      await drain(true);
+    } else {
+      queue.forEach((f) => f.close());
+    }
+    try { decoder.close(); } catch (e) {}
+    if (err && !run.stop && run.sentCount < run.windows * 0.9) throw err;
+  }
+
+  // Fallback: seek a <video> element to two moments per window and keep the sharper.
+  async function seekAll(info, best, takeWindow) {
+    const v = info.video;
+    const fps = run.fps;
+    const seek = (t) => new Promise((resolve) => {
+      let doneFlag = false;
+      const ok = () => { if (doneFlag) return; doneFlag = true; resolve(); };
+      v.addEventListener("seeked", () => {
+        if (v.requestVideoFrameCallback) { v.requestVideoFrameCallback(() => ok()); setTimeout(ok, 400); }
+        else ok();
+      }, { once: true });
+      v.currentTime = Math.min(t, Math.max(0, info.duration - 0.05));
+      setTimeout(ok, 4000);
+    });
+    for (let w = 0; w < run.windows; w++) {
+      if (run.stop) break;
+      if (run.error) throw run.error;
+      if (run.done.has(w)) continue;
+      let bestS = -1, bestT = 0;
+      for (const f of [0.3, 0.7]) {
+        const t = (w + f) / fps;
+        await seek(t);
+        const s = sharpness(v, v.videoWidth, v.videoHeight);
+        if (s > bestS) { bestS = s; bestT = t; drawRotated(best, v, v.videoWidth, v.videoHeight, 0); }
+      }
+      await takeWindow(w, bestT, bestS);
+      if (w % 5 === 0) updateProgress();
+    }
+  }
+
+  // ---------- events ----------
+  $("file").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) startRun(f);
+    e.target.value = "";
+  });
+  const drop = $("drop");
+  ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", (e) => {
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) startRun(f);
+  });
+  $("stop").addEventListener("click", () => {
+    if (!run || !run.active) return;
+    run.stop = true;
+    $("stop").disabled = true;
+    setStatus("Pausing after the frames already on their way\u2026", "warn");
+  });
+  $("resume").addEventListener("click", () => { if (chosenFile) startRun(chosenFile); });
+  setInterval(() => { if (run && run.active) updateProgress(); }, 1000);
+
+  connect();
+})();
+</script>
