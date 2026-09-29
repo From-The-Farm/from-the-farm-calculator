@@ -162,6 +162,7 @@ lay.save(os.path.join(OUT, 'top.jpg'), quality=82, optimize=True)
 
 # ------------------------------------------------------------------ design + meta
 shutil.copy('design/design.json', os.path.join(OUT, 'design.json'))
+if os.path.exists('irr/irrigation.json'): shutil.copy('irr/irrigation.json', os.path.join(OUT, 'irrigation.json'))
 az, el = math.radians(122.0), math.radians(40.0)
 sun = [math.sin(az) * math.cos(el), math.cos(az) * math.cos(el), math.sin(el)]
 places = [
@@ -175,6 +176,8 @@ places = [
     dict(name='Garden turf', mode='walk', pos=[-11.6, 7.0], look=[-20.0, 11.2, 0.3]),
     dict(name='Office path', mode='walk', pos=[-27.4, 8.3], look=[-18.0, 5.2, 1.2]),
     dict(name='Whole yard from above', mode='orbit', pos=[-24.0, -34.0, 34.0], look=[-6.0, 1.0, 0.0]),
+    dict(name='Sprinkler plan', mode='top', pos=[3.2, 0.25, 38.0], look=[3.2, 0.3, 0.0], irr='plan'),
+    dict(name='Sprinklers running', mode='walk', pos=[3.0, 7.95], look=[3.0, -6.0, 0.2], irr='run2'),
 ]
 about = ('Built from your walk-around video, with the 9.25.26 plan placed at true size. It is lined up on the vinyl fence, '
          'the back fence and the porch; sizes come from the fence height and the office doors, good to about half a metre. '

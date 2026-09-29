@@ -187,6 +187,9 @@
   .joy .knob { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: rgba(255,255,255,.85); }
   .show-panel { position: absolute; right: 12px; top: 12px; z-index: 5; }
   .labels { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
+  .labels span.irr { font: 600 11px/1 var(--mono); padding: 2px 4px; border: 0; color: #fff; background: #2a78e0; }
+  .labels span.irr.z2 { background: #d86f16; }
+  .labels span.irr.eq { background: #1e2220; }
   .labels span { position: absolute; transform: translate(-50%, -100%); font: 700 13px/1 var(--display); background: var(--survey); color: #1a0c05; padding: 3px 6px; border: 1px solid #1a0c05; white-space: nowrap; }
 
   .app.nowalk .joy { display: none !important; }
@@ -261,6 +264,16 @@
         </div>
         <label class="toggle"><input type="checkbox" id="t-fountain" checked><span><span class="t">Boulder fountains</span><span class="d">Water bubbling over the big red rocks.</span></span></label>
         <label class="toggle"><input type="checkbox" id="t-paths" checked><span><span class="t">Office path ideas</span><span class="d">My first pass. Draw your own below.</span></span></label>
+        <div class="opt">
+          <span class="t">Lawn sprinklers</span>
+          <div class="seg" role="group" aria-label="Lawn sprinklers" data-opt="irr">
+            <button type="button" data-v="off" aria-pressed="true">Off</button>
+            <button type="button" data-v="plan" aria-pressed="false">Layout</button>
+            <button type="button" data-v="run1" aria-pressed="false">Run 1</button>
+            <button type="button" data-v="run2" aria-pressed="false">Run 2</button>
+          </div>
+          <p class="hint" id="irr-note" hidden>12 rotary heads in 2 zones. Tie in at the capped riser under the kitchen counter; the backflow and valves sit by the east fence. Pipes are drawn on the surface where they run underground. <a href="https://claude.ai/artifact/MDUBKWC4PPokjXXbwNfgYr" target="_blank" rel="noopener">Full plan and parts list</a></p>
+        </div>
         <label class="toggle"><input type="checkbox" id="t-marks" checked><span><span class="t">Your marks</span></span></label>
       </div>
 
@@ -343,7 +356,7 @@ const P2T = (x, y, z) => new THREE.Vector3(x, z, -y);
 const T2P = (v) => [v.x, -v.z, v.y];
 
 const state = {
-  mode: 'walk', plan: true, roof: true, fence: true, screen: '24', garden: 'turf', fountain: true, paths: true, marks: true,
+  mode: 'walk', plan: true, roof: true, fence: true, screen: '24', garden: 'turf', fountain: true, paths: true, marks: true, irr: 'off',
 };
 let meta = null;
 
@@ -816,6 +829,7 @@ function flyTo(pos, target, dur = 900, then) {
   anim = { t0: performance.now(), dur, p0: camera.position.clone(), p1: pos.clone(), q0, q1, target: target.clone(), then };
 }
 function goPlace(p) {
+  if (p.irr) { state.irr = p.irr; applyIrr(); }
   if (p.mode === 'walk' || !p.mode) {
     if (state.mode !== 'walk') setMode('walk', { keep: true });
     const from = [walk.x, walk.y];
@@ -1116,6 +1130,7 @@ function lookAtMark(m) {
 const labelEls = new Map();
 function refreshLabels() {
   const box = $('labels'); box.textContent = ''; labelEls.clear();
+  refreshIrrLabels();
   if (!state.marks) return;
   for (const m of marks.values()) { const s = document.createElement('span'); s.textContent = m.n; box.append(s); labelEls.set(m.id, s); }
 }
@@ -1144,6 +1159,148 @@ async function connectDb() {
       $('db-status').textContent = marks.size ? 'Saved for Claude.' : '';
     }, (err) => { $('db-status').textContent = 'Live updates stopped (' + ((err && err.code) || 'error') + '). Reload to reconnect.'; });
   } catch (err) { db = null; $('db-status').textContent = 'Marks can\u2019t be saved in this view.'; }
+}
+
+
+// ------------------------------------------------------------------ lawn sprinklers (heads, pipes, valves, spray)
+const irr = { d: null, root: new THREE.Group(), cover: new THREE.Group(), equip: new THREE.Group(), pipes: { 0: new THREE.Group(), 1: new THREE.Group(), 2: new THREE.Group() },
+  heads: [], streams: { 1: [], 2: [] }, labels: [] };
+irr.root.visible = false; scene.add(irr.root);
+irr.root.add(irr.cover, irr.equip, irr.pipes[0], irr.pipes[1], irr.pipes[2]);
+const IRR_COL = { 0: 0xb3262e, 1: 0x2a78e0, 2: 0xe07a1f };
+function irrRibbon(pts, w, mat, lift) {
+  const verts = [], idx = [];
+  const P = pts.map((q) => new THREE.Vector2(q[0], q[1]));
+  const samp = [];
+  for (let i = 0; i < P.length - 1; i++) { const n = Math.max(1, Math.ceil(P[i].distanceTo(P[i + 1]) / 0.3)); for (let k = 0; k < n; k++) samp.push(P[i].clone().lerp(P[i + 1], k / n)); }
+  samp.push(P[P.length - 1]);
+  for (let i = 0; i < samp.length; i++) {
+    const a = samp[Math.max(0, i - 1)], b = samp[Math.min(samp.length - 1, i + 1)];
+    const dd = b.clone().sub(a); if (dd.lengthSq() < 1e-12) dd.set(1, 0); dd.normalize();
+    const nx = -dd.y * w / 2, ny = dd.x * w / 2;
+    for (const sgn of [1, -1]) { const x = samp[i].x + nx * sgn, y = samp[i].y + ny * sgn; verts.push(x, Math.max(groundAt(x, y), 0.0) + lift, -y); }
+    if (i) { const o = 2 * (i - 1); idx.push(o, o + 1, o + 2, o + 1, o + 3, o + 2); }
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3)); g.setIndex(idx);
+  const m = new THREE.Mesh(g, mat); m.renderOrder = 18; return m;
+}
+function fanMesh(h, mat, lift) {
+  const n = Math.max(8, Math.round(h.arc / 5)), R = h.R;
+  const verts = [h.x, 0.06, -h.y], idx = [];
+  for (let i = 0; i <= n; i++) { const a = (h.a0 + h.arc * i / n) * Math.PI / 180; const x = h.x + R * Math.cos(a), y = h.y + R * Math.sin(a); verts.push(x, Math.max(groundAt(x, y), 0) + lift, -y); if (i) idx.push(0, i, i + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3)); g.setIndex(idx);
+  const m = new THREE.Mesh(g, mat); m.renderOrder = 17; return m;
+}
+const streamMat = new THREE.LineBasicMaterial({ color: 0xf2faff, transparent: true, opacity: 0.5, depthWrite: false });
+const mistMat = new THREE.MeshBasicMaterial({ color: 0xcfeaff, transparent: true, opacity: 0.10, depthWrite: false, side: THREE.DoubleSide });
+function makeStreams(h) {
+  // an MP rotator throws a few thin streams at different angles that sweep slowly around the arc;
+  // each stream is drawn as short dashes that travel outward, so it reads as moving water
+  const nd = Math.max(3, Math.round(h.arc / 22)), traj = [[0.5, 0.32], [0.78, 0.55], [1.0, 0.7]], dashes = 5, sub = 3;
+  const count = nd * traj.length * dashes * sub * 2;
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+  const line = new THREE.LineSegments(g, streamMat); line.frustumCulled = false; line.renderOrder = 19;
+  const mist = fanMesh(h, mistMat, 0.08);
+  const grp = new THREE.Group(); grp.add(line, mist); grp.visible = false;
+  return { h, nd, traj, dashes, sub, g, grp, z0: 0.12 };
+}
+function updateStreams(st, t) {
+  const { h, nd, traj, dashes, sub } = st, pos = st.g.attributes.position.array;
+  const z0 = st.z0, speed = 12, flow = 0.9;            // sweep in degrees per second; dash travel in stream-lengths per second
+  let o = 0;
+  for (let i = 0; i < nd; i++) {
+    const frac = ((i / nd) * h.arc + t * speed) % h.arc;
+    const a = (h.a0 + frac) * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+    for (let j = 0; j < traj.length; j++) {
+      const [rf, hf] = traj[j], Rl = h.R * rf, apex = 0.12 * Rl * hf;
+      for (let k = 0; k < dashes; k++) {
+        const u0 = ((k / dashes) + t * flow / (0.6 + rf) + j * 0.13) % 1, u1 = Math.min(1, u0 + 0.055);
+        for (let q = 0; q < sub; q++) {
+          const ua = u0 + (u1 - u0) * q / sub, ub = u0 + (u1 - u0) * (q + 1) / sub;
+          for (const u of [ua, ub]) {
+            const r = Rl * u; pos[o++] = h.x + r * ca; pos[o++] = z0 + 4 * apex * u * (1 - u); pos[o++] = -(h.y + r * sa);
+          }
+        }
+      }
+    }
+  }
+  st.g.attributes.position.needsUpdate = true;
+}
+function irrLabel(text, x, y, z, cls) { const el = document.createElement('span'); el.className = 'irr ' + cls; el.textContent = text; irr.labels.push({ el, x, y, z, cls }); }
+function buildIrrigation(d) {
+  irr.d = d;
+  const pipeMats = {};
+  const pm = (z) => pipeMats[z] || (pipeMats[z] = new THREE.MeshBasicMaterial({ color: IRR_COL[z], transparent: true, opacity: 0.92, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }));
+  for (const p of d.pipes) {
+    const w = p.kind === 'main' ? 0.09 : p.kind === 'swing' ? 0.03 : (p.size === '1"' ? 0.07 : 0.05);
+    irr.pipes[p.kind === 'main' ? 0 : p.zone].add(irrRibbon(p.pts, w, pm(p.kind === 'main' ? 0 : p.zone), 0.05));
+  }
+  const sleeveMat = new THREE.MeshBasicMaterial({ color: 0x6d6a66, transparent: true, opacity: 0.55, depthWrite: false });
+  for (const sl of d.sleeves) irr.pipes[0].add(irrRibbon(sl.pts, sl.size.startsWith('3') ? 0.2 : 0.15, sleeveMat, 0.045));
+  const coverMat = { 1: new THREE.MeshBasicMaterial({ color: IRR_COL[1], transparent: true, opacity: 0.10, depthWrite: false, side: THREE.DoubleSide }),
+                     2: new THREE.MeshBasicMaterial({ color: IRR_COL[2], transparent: true, opacity: 0.10, depthWrite: false, side: THREE.DoubleSide }) };
+  const capMat = new THREE.MeshStandardMaterial({ color: 0x1d1f1e, roughness: 0.6 });
+  const ringMat = { 1: new THREE.MeshBasicMaterial({ color: IRR_COL[1] }), 2: new THREE.MeshBasicMaterial({ color: IRR_COL[2] }) };
+  for (const h of d.heads) {
+    const z = Math.max(groundAt(h.x, h.y), 0);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.055, 0.035, 20), capMat); cap.position.copy(P2T(h.x, h.y, z + 0.018));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.07, 0.11, 24), ringMat[h.zone]); ring.rotation.x = -Math.PI / 2; ring.position.copy(P2T(h.x, h.y, z + 0.052)); ring.renderOrder = 19;
+    irr.equip.add(cap, ring);
+    irr.cover.add(fanMesh(h, coverMat[h.zone], 0.06));
+    const st = makeStreams(h); irr.streams[h.zone].push(st); irr.root.add(st.grp);
+    irrLabel(h.id, h.x, h.y, z + 0.35, 'z' + h.zone);
+  }
+  // equipment
+  const green = new THREE.MeshStandardMaterial({ color: 0x2f7d3a, roughness: 0.7 }), brass = new THREE.MeshStandardMaterial({ color: 0xb08a3e, roughness: 0.4, metalness: 0.6 });
+  const white = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.5 }), dark = new THREE.MeshStandardMaterial({ color: 0x2a2c2b, roughness: 0.6 });
+  const vz = groundAt(d.valves.x, d.valves.y);
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.04, 0.44), green); lid.position.copy(P2T(d.valves.x, d.valves.y, vz + 0.02)); irr.equip.add(lid);
+  const bz = groundAt(d.pvb.x, d.pvb.y), pvb = new THREE.Group();
+  for (const dy of [-0.09, 0.09]) { const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.42, 12), brass); leg.position.set(0, 0.21, -dy); pvb.add(leg); }
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.26, 16), brass); body.rotation.x = Math.PI / 2; body.position.set(0, 0.44, 0); pvb.add(body);
+  const bonnet = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.055, 0.1, 16), green); bonnet.position.set(0, 0.52, 0); pvb.add(bonnet);
+  pvb.position.copy(P2T(d.pvb.x, d.pvb.y, bz)); irr.equip.add(pvb);
+  const pz = Math.max(groundAt(d.poc.x, d.poc.y), 0);
+  const riser = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.28, 12), dark); riser.position.copy(P2T(d.poc.x, d.poc.y, pz + 0.14)); irr.equip.add(riser);
+  const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.9, 10), new THREE.MeshBasicMaterial({ color: IRR_COL[0] })); pin.position.copy(P2T(d.poc.x, d.poc.y, pz + 0.95)); irr.equip.add(pin);
+  for (const stb of d.stubs) { const sz = groundAt(stb.x, stb.y); const m = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.35, 12), white); m.position.copy(P2T(stb.x, stb.y, sz + 0.17)); irr.equip.add(m); }
+  const ctrl = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.08), dark); ctrl.position.copy(P2T(d.controller.x - 0.12, d.controller.y + 0.12, 1.35)); irr.equip.add(ctrl);
+  irrLabel('Tie-in', d.poc.x, d.poc.y, pz + 2.05, 'eq');
+  irrLabel('Backflow', d.pvb.x, d.pvb.y, bz + 0.75, 'eq');
+  irrLabel('Valves', d.valves.x, d.valves.y, vz + 0.3, 'eq');
+  irrLabel('Controller', d.controller.x, d.controller.y, 1.75, 'eq');
+  irrLabel('Stub-up', d.stubs[1].x, d.stubs[1].y, 0.55, 'eq');
+}
+function applyIrr() {
+  const m = state.irr;
+  irr.root.visible = m !== 'off';
+  irr.cover.visible = m === 'plan';
+  irr.pipes[1].visible = m === 'plan' || m === 'run1';
+  irr.pipes[2].visible = m === 'plan' || m === 'run2';
+  for (const z of [1, 2]) for (const st of irr.streams[z]) st.grp.visible = m === 'run' + z;
+  $('irr-note').hidden = m === 'off';
+  document.querySelectorAll('[data-opt="irr"] button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === m)));
+  refreshIrrLabels();
+}
+function refreshIrrLabels() {
+  const box = $('labels');
+  for (const L of irr.labels) {
+    const zone = L.cls.startsWith('z') ? +L.cls[1] : 0;
+    const show = state.irr !== 'off' && (zone === 0 || state.irr === 'plan' || state.irr === 'run' + zone);
+    if (show && !L.el.isConnected) box.append(L.el);
+    if (!show && L.el.isConnected) L.el.remove();
+  }
+}
+function placeIrrLabels() {
+  if (state.irr === 'off') return;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  for (const L of irr.labels) {
+    if (!L.el.isConnected) continue;
+    const v = new THREE.Vector3(L.x, L.z, -L.y).project(camera);
+    const on = v.z < 1 && v.z > -1 && Math.abs(v.x) < 1.05 && Math.abs(v.y) < 1.05 && (state.mode !== 'walk' || L.cls === 'eq' || camera.position.distanceTo(new THREE.Vector3(L.x, L.z, -L.y)) < 16);
+    L.el.style.display = on ? '' : 'none';
+    if (on) { L.el.style.left = ((v.x + 1) / 2 * w) + 'px'; L.el.style.top = ((1 - v.y) / 2 * h) + 'px'; }
+  }
 }
 
 // ------------------------------------------------------------------ minimap
@@ -1189,7 +1346,7 @@ bind('t-plan', 'plan'); bind('t-roof', 'roof'); bind('t-fence', 'fence'); bind('
 document.querySelectorAll('[data-opt]').forEach((g) => g.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
   state[g.dataset.opt] = b.dataset.v;
   g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-  applyLayers();
+  if (g.dataset.opt === 'irr') applyIrr(); else applyLayers();
 })));
 $('collapse').addEventListener('click', () => {
   const p = $('panel'); const c = !p.classList.contains('collapsed');
@@ -1216,10 +1373,11 @@ function frame(now) {
   } else if (state.mode === 'walk') stepWalk(dt);
   else orbit.update();
   for (const m of waterMats) m.userData.tick && m.userData.tick(now / 1000);
+  if (state.irr === 'run1' || state.irr === 'run2') for (const st of irr.streams[state.irr === 'run1' ? 1 : 2]) updateStreams(st, now / 1000);
   camera.updateMatrixWorld();
   if (splat) splat.update(camera);
   renderer.render(scene, camera);
-  placeLabels();
+  placeLabels(); placeIrrLabels();
   if ((frame.n = (frame.n || 0) + 1) % 3 === 0) drawMini();
   requestAnimationFrame(frame);
 }
@@ -1274,6 +1432,7 @@ async function boot() {
     console.warn('design model failed', e);
     $('about').textContent = 'The plan model could not load: ' + e.message;
   }
+  try { buildIrrigation(await fetchJSON('data/irrigation.json')); } catch (e) { console.warn('sprinkler layout failed', e); }
   applyLayers();
   // splats
   const h = meta.splat;
@@ -1296,6 +1455,10 @@ async function boot() {
   $('loader').hidden = true;
   showTip(window.matchMedia('(pointer: coarse)').matches ? 'Drag to look around. Use the circle to walk, or tap the ground.' : 'Drag to look around. Click the ground to walk there.');
   setTimeout(() => showTip(null), 6000);
+  if (location.hash === '#sprinklers' && irr.d) {
+    const p = (meta.places || []).find((q) => q.irr === 'plan');
+    if (p) goPlace(p); else { state.irr = 'plan'; applyIrr(); }
+  }
 }
 
 function setupWater() {

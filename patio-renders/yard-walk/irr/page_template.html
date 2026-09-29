@@ -1,0 +1,255 @@
+<title>Lawn Sprinkler Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+  /* Layout: an irrigation construction sheet. The to-scale drawing sits beside the tie-in notes, and the schedules follow. */
+  :root {
+    --paper: #f3f4f0;
+    --sheet: #fbfbf8;
+    --ink: #1c211e;
+    --muted: #58625b;
+    --rule: #cfd5cd;
+    --lawn: #bcd9a2;
+    --lawn-edge: #6b9a4a;
+    --concrete: #dcd9d2;
+    --pavers: #8e8b86;
+    --nook: #d3c4b1;
+    --strip: #c9c1b3;
+    --fence: #77736b;
+    --z1: #1b64c4;
+    --z2: #d06a12;
+    --main: #a3242c;
+    --cov1: rgba(27, 100, 196, 0.10);
+    --cov2: rgba(208, 106, 18, 0.10);
+    --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --body: "Public Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #121513; --sheet: #191d1a; --ink: #e2e7e2; --muted: #9aa49c; --rule: #333a35;
+      --lawn: #2f4d28; --lawn-edge: #7fae5c; --concrete: #3b3e3b; --pavers: #5c5955; --nook: #4c443a; --strip: #463f35; --fence: #a39d92;
+      --z1: #62a6f5; --z2: #f0a04e; --main: #ea6a72;
+      --cov1: rgba(98, 166, 245, 0.14); --cov2: rgba(240, 160, 78, 0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #121513; --sheet: #191d1a; --ink: #e2e7e2; --muted: #9aa49c; --rule: #333a35;
+    --lawn: #2f4d28; --lawn-edge: #7fae5c; --concrete: #3b3e3b; --pavers: #5c5955; --nook: #4c443a; --strip: #463f35; --fence: #a39d92;
+    --z1: #62a6f5; --z2: #f0a04e; --main: #ea6a72;
+    --cov1: rgba(98, 166, 245, 0.14); --cov2: rgba(240, 160, 78, 0.14);
+  }
+  html { background: var(--paper); }
+  body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; display: grid; gap: 30px; }
+  .eyebrow, .k, th { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  h1 { font-family: var(--display); font-stretch: 75%; font-weight: 760; font-size: clamp(34px, 5vw, 50px); line-height: 0.95; margin: 6px 0 12px; text-transform: uppercase; text-wrap: balance; }
+  h2 { font-family: var(--display); font-stretch: 80%; font-weight: 720; font-size: 22px; line-height: 1.1; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.01em; text-wrap: balance; }
+  h3 { font-size: 15px; margin: 0 0 4px; }
+  p { margin: 0; max-width: 68ch; }
+  .lead { font-size: 16.5px; }
+  a { color: var(--z1); text-underline-offset: 2px; }
+  .specs { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 16px 0 0; padding: 12px 0 0; border-top: 1.5px solid var(--ink); }
+  .specs div { display: grid; gap: 2px; }
+  .specs dd { margin: 0; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+  .specs dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+  .sheet { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+  @media (max-width: 860px) { .sheet { grid-template-columns: minmax(0, 1fr); } }
+  .drawing { background: var(--sheet); border: 1.5px solid var(--ink); padding: 10px; display: grid; gap: 8px; min-width: 0; }
+  .drawing .bar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+  .chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13.5px; cursor: pointer; }
+  .chk input { width: 16px; height: 16px; margin: 0; accent-color: var(--z1); }
+  .planscroll { overflow-x: auto; }
+  .plan { width: 100%; min-width: 560px; height: auto; display: block; font-family: var(--mono); }
+  .plan .concrete { fill: var(--concrete); }
+  .plan .pavers { fill: var(--pavers); opacity: 0.55; }
+  .plan .nook { fill: var(--nook); }
+  .plan .lawn { fill: var(--lawn); stroke: var(--lawn-edge); stroke-width: 1.2; }
+  .plan .pavilion { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 6 5; }
+  .plan .counter { fill: none; stroke: var(--muted); stroke-width: 1; }
+  .plan .strip { fill: var(--strip); opacity: 0.7; }
+  .plan .fence { stroke: var(--fence); stroke-width: 3; }
+  .plan .ctx { font-size: 11px; fill: var(--muted); letter-spacing: 0.06em; }
+  .plan .lawnlbl { font-size: 13px; fill: var(--lawn-edge); font-weight: 500; }
+  .plan .cov { stroke: none; }
+  .plan .cov.z1 { fill: var(--cov1); }
+  .plan .cov.z2 { fill: var(--cov2); }
+  .plan .pipe { fill: none; stroke-linejoin: round; stroke-linecap: round; stroke-width: 2.2; }
+  .plan .pipe.big { stroke-width: 3.6; }
+  .plan .pipe.z1 { stroke: var(--z1); }
+  .plan .pipe.z2 { stroke: var(--z2); }
+  .plan .pipe.main { stroke: var(--main); stroke-width: 4; }
+  .plan .pipe.swing { stroke-width: 1.4; stroke-dasharray: 3 3; }
+  .plan .sleeve { fill: url(#hatch); stroke: var(--muted); stroke-width: 1; }
+  .plan .sleeve-bg { fill: var(--concrete); }
+  .plan .sleeve-line { stroke: var(--muted); stroke-width: 1.4; }
+  .plan .valvebox { fill: #2f7d3a; stroke: var(--ink); stroke-width: 1; }
+  .plan .pvb { fill: #b0873e; stroke: var(--ink); stroke-width: 1; }
+  .plan .poc { fill: var(--main); stroke: var(--sheet); stroke-width: 2; }
+  .plan .stub { fill: var(--sheet); stroke: var(--ink); stroke-width: 1.5; }
+  .plan .ctrl { fill: var(--ink); }
+  .plan .callout line { stroke: var(--ink); stroke-width: 1; }
+  .plan .callout text { font-size: 11px; fill: var(--ink); font-weight: 500; }
+  .plan .hsym { stroke: var(--sheet); stroke-width: 1; }
+  .plan .head.z1 .hsym, .plan .head.z1 .hdot { fill: var(--z1); }
+  .plan .head.z2 .hsym, .plan .head.z2 .hdot { fill: var(--z2); }
+  .plan .hid { font-size: 11.5px; font-weight: 500; fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-width: 3px; }
+  .plan .dim line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 3; }
+  .plan .dim text { font-size: 11px; fill: var(--ink); paint-order: stroke; stroke: var(--lawn); stroke-width: 3px; }
+  .plan .north path { fill: var(--ink); }
+  .plan .north text, .plan .scale text { font-size: 11px; fill: var(--ink); }
+  .plan .sb1 { fill: var(--ink); } .plan .sb2 { fill: var(--sheet); stroke: var(--ink); stroke-width: 1; }
+  .plan.hide-spray .spray { display: none; }
+  .plan.hide-z1 .z1 { display: none; }
+  .plan.hide-z2 .z2 { display: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); }
+  .legend span { display: inline-flex; gap: 6px; align-items: center; }
+  .sw { width: 22px; height: 10px; display: inline-block; }
+  .side { display: grid; gap: 22px; min-width: 0; }
+  .note { border-left: 3px solid var(--main); padding-left: 12px; display: grid; gap: 6px; }
+  .note.blue { border-left-color: var(--z1); }
+  ul, ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 72ch; }
+  .tablebox { overflow-x: auto; border-top: 1.5px solid var(--ink); }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14px; }
+  th { text-align: left; padding: 9px 10px 7px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  td.num, th.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .zchip { display: inline-block; font-family: var(--mono); font-size: 12.5px; padding: 1px 7px; border-radius: 999px; color: #fff; }
+  .zchip.z1 { background: var(--z1); } .zchip.z2 { background: var(--z2); }
+  :root:not([data-theme="light"]) .zchip { color: #fff; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 26px; }
+  .cols > section { min-width: 0; display: grid; gap: 10px; align-content: start; }
+  section { display: grid; gap: 10px; }
+  .foot { color: var(--muted); font-size: 13px; border-top: 1px solid var(--rule); padding-top: 14px; display: grid; gap: 6px; }
+  input:focus-visible, a:focus-visible { outline: 3px solid var(--z1); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Zitting yard &middot; plan 9.25.26 &middot; lawn irrigation</div>
+    <h1>Lawn Sprinkler Plan</h1>
+    <p class="lead">Twelve rotary sprinkler heads water the {{SQFT}} sq ft lawn inside the new walks in two zones. Water comes from the capped pipe already in the ground where the outdoor-kitchen sink will go. The backflow preventer and the valve box sit in the planting strip by the east fence. You can see the same layout in 3D in the <a href="https://claude.ai/artifact/PBVPmfLebjzXWV7xjJifmQ#sprinklers" target="_blank" rel="noopener">yard walk-through</a>.</p>
+    <dl class="specs">
+      <div><dt>Heads</dt><dd>12 &middot; Hunter MP3000</dd></div>
+      <div><dt>Zones</dt><dd>2 &middot; {{Z1GPM}} + {{Z2GPM}} GPM</dd></div>
+      <div><dt>Water needed</dt><dd>&ge; 9 GPM at &ge; {{NEED_PSI}} psi</dd></div>
+      <div><dt>Rainfall rate</dt><dd>0.4 in/hr</dd></div>
+      <div><dt>Coverage uniformity</dt><dd>{{DU}} (modelled)</dd></div>
+    </dl>
+  </header>
+
+  <div class="sheet">
+    <figure class="drawing" style="margin:0">
+      <div class="bar">
+        <label class="chk"><input type="checkbox" id="t-spray" checked> Spray coverage</label>
+        <label class="chk"><input type="checkbox" id="t-z1" checked> Zone 1</label>
+        <label class="chk"><input type="checkbox" id="t-z2" checked> Zone 2</label>
+      </div>
+      <div class="planscroll">{{SVG}}</div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--z1)"></i>Zone 1 pipe &amp; heads</span>
+        <span><i class="sw" style="background:var(--z2)"></i>Zone 2 pipe &amp; heads</span>
+        <span><i class="sw" style="background:var(--main)"></i>Mainline, always pressurized</span>
+        <span><i class="sw" style="background:repeating-linear-gradient(45deg,var(--muted) 0 2px,var(--concrete) 2px 6px)"></i>Sleeve under new concrete</span>
+        <span>Thick line = 1&Prime; pipe, thin = &frac34;&Prime;, dashed = &frac12;&Prime; swing pipe</span>
+        <span>Wedge = spray direction and arc</span>
+      </div>
+    </figure>
+
+    <div class="side">
+      <section class="note">
+        <div class="k">Where to connect to water</div>
+        <h3>The capped riser under the kitchen counter</h3>
+        <p>Your video shows a black riser with capped outlets about 3 ft east of the planned sink, under the back counter of the outdoor kitchen. Right beside it, where the sink goes, is a tall white pipe that is probably the sink drain. The riser is almost certainly the water line roughed in for the kitchen. Tee the sprinklers off it, add a 1&Prime; shut-off valve, and run the mainline east under the pad and the walk to the fence strip.</p>
+        <p>Before you buy parts, open one cap to confirm it is live house water, and see <a href="#supply">Check your water first</a>. A second capped stub with a coil of black pipe sits inside the new lawn by the east walk. Find out what it is, then use it or cap it below grade before the sod goes down.</p>
+      </section>
+      <section class="note blue">
+        <div class="k">Before the concrete is poured</div>
+        <p>Two sleeves have to go in before the new pad and walk are poured:</p>
+        <ul>
+          <li>A 2&Prime; sleeve for the mainline, from the riser east under the pad and the east walk.</li>
+          <li>A 3&Prime; sleeve for both zone pipes and the valve wire, under the east walk at the lawn&rsquo;s NE corner.</li>
+        </ul>
+        <p>Bury the mainline 12&ndash;18&Prime; deep and the zone pipes 8&ndash;12&Prime; deep.</p>
+      </section>
+      <section>
+        <div class="k">Equipment by the east fence</div>
+        <p><b>Backflow preventer (PVB)</b> in the strip between the east walk and the fence, 12&Prime; above the lawn so it can protect the house water. <b>Valve box</b> with three 1&Prime; valves next to it: zone 1, zone 2, and a spare for a future drip zone along the fences. <b>Controller</b> on the pavilion post by the kitchen, which will have power. About 30 ft of valve wire runs through the walk sleeve.</p>
+      </section>
+    </div>
+  </div>
+
+  <section>
+    <h2>Head schedule</h2>
+    <p>Set every head flush with the finished grade, 2&ndash;4&Prime; in from the concrete. Each head sits on a 6&Prime; pop-up body regulated to 40&nbsp;psi, connected with &frac12;&Prime; swing pipe. Positions are measured from the new concrete edges in the plan.</p>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Head</th><th>Where</th><th>Nozzle</th><th class="num">Arc</th><th class="num">Radius</th><th class="num">GPM</th></tr></thead>
+        <tbody>
+{{HEAD_ROWS}}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="cols">
+    <section>
+      <h2>Zones and watering</h2>
+      <p><b>Zone 1 (north half):</b> 6 heads, {{Z1GPM}} GPM. <b>Zone 2 (south half and centre):</b> 6 heads, {{Z2GPM}} GPM. The two zones run one after the other, never together.</p>
+      <p><b>Starting schedule for peak summer:</b> 3 days a week, two 35-minute cycles per zone with an hour between them, about 1.4&Prime; a week. Use about half that in spring and fall. MP rotators put water down slowly (0.4&Prime; an hour), so long run times are normal and the water soaks in without running off. A weather-based controller adjusts this for you. Stay within your city&rsquo;s watering days.</p>
+    </section>
+    <section id="supply">
+      <h2>Check your water first</h2>
+      <ol>
+        <li><b>Pressure.</b> Screw a $10 hose-bib pressure gauge onto an outside faucet with all water off. You want 55&ndash;80&nbsp;psi.</li>
+        <li><b>Flow.</b> Open that faucet all the way and time how long a 5-gallon bucket takes to fill. 30 seconds is 10&nbsp;GPM. You want at least 9&nbsp;GPM.</li>
+        <li><b>Lower than that?</b> Split the lawn into three zones of about 5&nbsp;GPM each. The same heads and pipes work; only the valve wiring changes.</li>
+      </ol>
+      <p>If your lot has pressurized secondary irrigation water, use that instead of house water. It usually has more flow and needs no PVB.</p>
+    </section>
+  </div>
+
+  <section>
+    <h2>Parts list</h2>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Item</th><th>Model or amount</th><th class="num">Qty</th></tr></thead>
+        <tbody>{{MAT_ROWS}}</tbody>
+      </table>
+    </div>
+    <p>Pipe amounts are measured from the drawing: {{MAIN_FT}} ft of 1&Prime; mainline, {{LAT1_FT}} ft of 1&Prime; and {{LAT34_FT}} ft of &frac34;&Prime; zone pipe. Buy about 10% extra, plus tees, elbows and PVC primer and cement. Rain Bird R-VAN nozzles on 1806-PRS bodies are a like-for-like swap for the Hunter parts.</p>
+  </section>
+
+  <section>
+    <h2>Install order</h2>
+    <ol>
+      <li>Before the concrete work, confirm the riser is live water, lay both sleeves, and run the 1&Prime; mainline to the fence strip.</li>
+      <li>After the concrete cures, set the PVB, the valve box and the valves in the strip. Pressure-test the mainline.</li>
+      <li>Grade the lawn area. Paint the head positions and pipe runs from this drawing, then trench.</li>
+      <li>Lay the zone pipes and glue the fittings. Flush each zone with the heads off.</li>
+      <li>Install the bodies on swing pipe, flush with grade. Add the nozzles, then set each arc and radius from the schedule.</li>
+      <li>Run each zone and walk the lawn. Trim radii where water lands on the concrete.</li>
+      <li>Wire the valves to the controller, set the schedule, and lay the sod.</li>
+    </ol>
+  </section>
+
+  <footer class="foot">
+    <p><b>How the layout was chosen.</b> Heads go at every corner and along each edge so each head reaches its neighbours (head-to-head spacing). One full-circle head covers the middle. Head positions, arcs and radii were then tuned in a simulation of the whole lawn. Lower-quarter uniformity came out at {{DU}}, with about {{OVER}}% of the water landing past the lawn edge. A real system typically lands around 0.7, which is still good for lawn. All MP rotators put down water at the same rate whatever their arc, so the zones stay even.</p>
+    <p>Dimensions come from the 9.25.26 plan, so they are exact to the new concrete. The riser, the stub-up and the fence were located from your video and are good to within about a foot.</p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    const plan = document.querySelector('svg.plan');
+    const bind = (id, cls) => {
+      const el = document.getElementById(id);
+      const sync = () => plan.classList.toggle(cls, !el.checked);
+      el.addEventListener('change', sync); sync();
+    };
+    bind('t-spray', 'hide-spray'); bind('t-z1', 'hide-z1'); bind('t-z2', 'hide-z2');
+  })();
+</script>

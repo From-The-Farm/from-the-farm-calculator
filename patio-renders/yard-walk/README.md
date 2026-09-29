@@ -22,6 +22,8 @@ and the satellite screenshot are private, so they are **not** committed. Only th
 | Web export | `gs/export_final.py`, `gs/export_web.py`, `align/ground_plan.py` | Writes splats in plan metres, quantised and base64 JSON-chunked. Adds per-splat hide flags (under the plan, the garden, old fences, fountain beds, tall canopy in the aerial views, haze), walk heightfields for today and the plan, the porch deck, blocked cells, and top-down minimaps. |
 | Viewer | `viewer/index.html` | three.js with its own splat shader (instanced quads, a worker-side counting sort) and the design as glTF. Walk, fly and top modes, layer toggles, and a markup tool that saves marks to the artifact database under `marks/<id>`. |
 
+| Lawn sprinklers | `irr/layout.py`, `irr/final_layout.py`, `irr/system.py`, `irr/make_page.py` | Places head-to-head Hunter MP3000 rotary heads on the plan's lawn: corners and edges first, then greedy interior heads. Arcs come from the edge geometry. Positions and radii are tuned on a simulated catch-can grid (lower-quarter DU about 0.87, about 3% overspray). Then zones are balanced by flow, zone pipes run 12" inside the lawn edge, and pipes are sized by velocity with a Hazen-Williams check. The mainline, sleeves and parts list are built from the tie-in (the capped kitchen riser seen in the video) to the PVB and valve box by the east fence. Writes the viewer layer data and the printable plan page. |
+
 ## Things the owner should know
 
 - Placement is good to roughly half a metre in the main yard; the far corners are less certain.
@@ -29,3 +31,5 @@ and the satellite screenshot are private, so they are **not** committed. Only th
   is left standing in the viewer so the conflict is visible.
 - The plan's north-east walk corner clips the big boulder by the power pole.
 - The fountain boulders are modelled stand-ins, placed at the size and spot of the real rocks.
+- The sprinkler tie-in assumes the capped riser under the planned kitchen counter is live house water; confirm it (and
+  the pressure and flow) before buying parts. Two sleeves must go under the new pad and east walk before they are poured.
